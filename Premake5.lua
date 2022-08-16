@@ -42,7 +42,6 @@ project "RenderApp"
 
     includedirs
 	{
-		
 		"%{IncludeDir.GLFW}",
         "%{IncludeDir.VulkanSDK}",
         "%{IncludeDir.glm}"
