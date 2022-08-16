@@ -45,7 +45,7 @@ project "RenderApp"
 		
 		"%{IncludeDir.GLFW}",
         "%{IncludeDir.VulkanSDK}",
-        "%{IncludeDir.glm}
+        "%{IncludeDir.glm}"
 		
 	}
     links
