@@ -8,8 +8,10 @@ workspace "RenderApp"
     outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
     IncludeDir = {}
     IncludeDir["GLFW"] = "%{wks.location}/Dependencies/GLFW/include"
+    
     IncludeDir["GLAD"] = "%{wks.location}/Dependencies/glad/include"
     IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
+    IncludeDir["glm"] = "Dependencies/glm"
     LibraryDir = {}
 
     LibraryDir["VulkanSDK"] = "%{VULKAN_SDK}/Lib"
@@ -42,7 +44,8 @@ project "RenderApp"
 	{
 		
 		"%{IncludeDir.GLFW}",
-        "%{IncludeDir.VulkanSDK}"
+        "%{IncludeDir.VulkanSDK}",
+        "%{IncludeDir.glm}
 		
 	}
     links
@@ -55,7 +58,11 @@ project "RenderApp"
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
-    files {"RenderApp/**.h", "RenderApp/**.cpp"}
+    files {
+        "%{prj.name}/**.h", "%{prj.name}/**.cpp", 
+        "Dependencies/glm/glm/**.hpp",
+        "Dependencies/glm/glm/**.inl",
+    }
 
     filter { "configurations:Debug" }
       defines { "DEBUG" }
