@@ -1,6 +1,4 @@
 # RenderApp
-RenderApplication
-# Summary
 A Vulcan Renderer to make 3D Applications
 
 # Getting Started
