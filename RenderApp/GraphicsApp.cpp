@@ -15,7 +15,6 @@ void GraphicsApp::Init()
 {
 	glfwInit();
 
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	m_Window = new Window(800, 600);
 	
 	if (!m_Renderer) m_Renderer = new Renderer(m_Window);
