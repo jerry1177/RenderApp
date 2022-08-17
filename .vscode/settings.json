@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "atomic": "cpp",
+        "charconv": "cpp",
+        "cstdint": "cpp",
+        "random": "cpp",
+        "stop_token": "cpp",
+        "type_traits": "cpp",
+        "xutility": "cpp"
+    }
+}

@@ -38,7 +38,8 @@ project "RenderApp"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
-    
+    pchheader "Renderpch.h"
+	pchsource "%{prj.name}/Renderpch.cpp"
 
     includedirs
 	{

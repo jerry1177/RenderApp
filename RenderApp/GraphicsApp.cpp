@@ -1,48 +1,47 @@
+#include "Renderpch.h"
 #include "GraphicsApp.h"
-#define GLFW_INCLUDE_VULKAN
-#include "GLFW/glfw3.h"
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
+
+
 #include <iostream>
+#include <GLFW/glfw3.h>
+
+GraphicsApp::GraphicsApp()
+{
+	
+}
 
 void GraphicsApp::Init()
 {
+	glfwInit();
 
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+	m_Window = new Window(800, 600);
+	
+	if (!m_Renderer) m_Renderer = new Renderer(m_Window);
+	m_Renderer->Init();
 	std::cout << "App Initialized!\n";
 }
 
 void GraphicsApp::Run()
 {
 	std::cout << "App Is Running!\n";
-	glfwInit();
-
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
-
-	uint32_t extensionCount = 0;
-	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-
-	std::cout << extensionCount << " extensions supported\n";
-	glm::mat4 matrix;
-	glm::vec4 vec;
-	auto test = matrix * vec;
-
-	std::cout << test.length() << std::endl;
-
-	while (!glfwWindowShouldClose(window)) {
+	
+	while (!glfwWindowShouldClose(m_Window->GetGLFWWindow())) {
 		glfwPollEvents();
+		m_Renderer->Render();
 	}
 
-	glfwDestroyWindow(window);
-
-	glfwTerminate();
+	
 	
 }
 
 void GraphicsApp::ShutDown()
 {
+	m_Renderer->ShutDown();
+	delete m_Window;
+	m_Window = nullptr;
+	glfwTerminate();
 	std::cout << "App Has Shut Down!\n";
+
 }
