@@ -63,6 +63,8 @@ project "RenderApp"
         "Dependencies/glm/glm/**.hpp",
         "Dependencies/glm/glm/**.inl",
     }
+    defines {"_GLFW_"}
+    
 
     filter { "configurations:Debug" }
       defines { "DEBUG" }

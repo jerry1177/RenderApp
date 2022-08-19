@@ -1,4 +1,5 @@
 #pragma once
+#include "vulkan/vulkan.hpp"
 class Window;
 class Renderer
 {
@@ -8,6 +9,10 @@ public:
 	void Render();
 	void ShutDown();
 private:
+	void createInstance();
+private:
 	Window* m_Window = nullptr;
+
+	VkInstance m_Instance;
 };
 
