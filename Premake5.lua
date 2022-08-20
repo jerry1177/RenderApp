@@ -12,6 +12,7 @@ workspace "RenderApp"
     IncludeDir["GLAD"] = "%{wks.location}/Dependencies/glad/include"
     IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
     IncludeDir["glm"] = "Dependencies/glm"
+
     LibraryDir = {}
 
     LibraryDir["VulkanSDK"] = "%{VULKAN_SDK}/Lib"
@@ -45,8 +46,8 @@ project "RenderApp"
 	{
 		"%{IncludeDir.GLFW}",
         "%{IncludeDir.VulkanSDK}",
-        "%{IncludeDir.glm}"
-		
+        "%{IncludeDir.glm}",
+		"%{prj.name}"
 	}
     links
 	{

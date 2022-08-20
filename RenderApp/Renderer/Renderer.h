@@ -13,6 +13,6 @@ private:
 private:
 	Window* m_Window = nullptr;
 
-	VkInstance m_Instance;
+	VulkanInstance* m_Instance = nullptr;
 };
 

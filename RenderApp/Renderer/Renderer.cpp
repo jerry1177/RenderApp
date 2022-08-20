@@ -36,7 +36,8 @@ void Renderer::ShutDown()
 
 void Renderer::createInstance()
 {
-	VulkanInstance temp;
-	temp.CreateVKInstance(temp.GetRequiredExtensions());
+	m_Instance = new VulkanInstance();
+	//const char** extensionNames = { VK_KHR_WIN32_SURFACE_EXTENSION_NAME, VK_KHR_SURFACE_EXTENSION_NAME };
+	m_Instance->CreateVKInstance(m_Instance->GetRequiredExtensions());
 	
 }
