@@ -64,8 +64,10 @@ project "RenderApp"
         "Dependencies/glm/glm/**.hpp",
         "Dependencies/glm/glm/**.inl",
     }
-    defines {"_GLFW_"}
-    
+    defines {" _GLFW_ "}
+
+    filter "system:windows"
+        defines { "VK_USE_PLATFORM_WIN32_KHR" }
 
     filter { "configurations:Debug" }
       defines { "DEBUG" }

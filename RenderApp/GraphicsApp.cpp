@@ -18,6 +18,12 @@ void GraphicsApp::Init()
 	m_Window = new Window(800, 600);
 	
 	if (!m_Renderer) m_Renderer = new Renderer(m_Window);
+#ifdef DEBUG
+	const std::vector<const char*> validationLayers = {
+	"VK_LAYER_KHRONOS_validation"
+	};
+	m_Renderer->EnableValidationLayers(validationLayers);
+#endif // DEBUG
 	m_Renderer->Init();
 	std::cout << "App Initialized!\n";
 }

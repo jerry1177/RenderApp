@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include <iostream>
+#include <array>
 #include <string>
 
 // Platform Detection

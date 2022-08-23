@@ -7,21 +7,15 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
-#include <GLFW/glfw3.h>
 #include "vulkan/vulkan.hpp"
+#include <GLFW/glfw3.h>
+
 #include "VulkanInstance.h"
 void Renderer::Init()
 {
+	std::vector<std::string> extensionNames = { VK_KHR_WIN32_SURFACE_EXTENSION_NAME, VK_KHR_SURFACE_EXTENSION_NAME };
+	m_Instance = new VulkanInstance(VulkanInstance::GetExtensionPropertiesFromStrings(extensionNames));
 	
-	uint32_t extensionCount = 0;
-	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-	createInstance();
-	std::cout << extensionCount << " extensions supported\n";
-	glm::mat4 matrix;
-	glm::vec4 vec;
-	auto test = matrix * vec;
-
-	std::cout << test.length() << std::endl;
 }
 
 void Renderer::Render()
@@ -31,13 +25,11 @@ void Renderer::Render()
 
 void Renderer::ShutDown()
 {
-
+	delete m_Instance;
 }
 
-void Renderer::createInstance()
+void Renderer::EnableValidationLayers(const std::vector<const char*>& validationLayers)
 {
-	m_Instance = new VulkanInstance();
-	//const char** extensionNames = { VK_KHR_WIN32_SURFACE_EXTENSION_NAME, VK_KHR_SURFACE_EXTENSION_NAME };
-	m_Instance->CreateVKInstance(m_Instance->GetRequiredExtensions());
-	
+	VulkanInstance::EnableValidationLayers(validationLayers);
 }
+
