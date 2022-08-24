@@ -20,7 +20,7 @@ void VRenderer::Init()
 	}
 	m_Instance = new VInstance(extensionNames);
 	m_Device = new VDevice(m_Instance);
-	std::cout << "Device count is: " << m_Device->GetDeviceCount() << std::endl;
+	std::cout << "Device count is: " << m_Device->GetPysicalDeviceCount() << std::endl;
 	
 }
 

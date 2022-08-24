@@ -4,6 +4,8 @@
 #include <iostream>
 #include <array>
 #include <string>
+#include <optional>
+#include <map>
 
 // Platform Detection
 
