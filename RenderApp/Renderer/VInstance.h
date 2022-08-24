@@ -11,7 +11,7 @@ public:
 
 	const std::vector<const char*>& GetSupportedExtensions() const { return m_SupportedExtensions; }
 	const std::vector<const char*>& GetRequiredExtensions() const { return m_RequiredExtensions; }
-	//static std::vector<VkExtensionProperties> GetExtensionPropertiesFromStrings(const std::vector<std::string>&);
+	VkInstance GetHandle() const { return m_Instance; }
 	static void EnableValidationLayers(std::vector<const char*> validationLayers) { m_ValidationLayers = validationLayers; }
 	static bool HasEnabledValidationLayers() { return m_ValidationLayers.size() > 0; }
 private:

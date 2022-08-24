@@ -2,6 +2,8 @@
 
 class Window;
 class VInstance;
+class VDevice;
+
 class VRenderer
 {
 public:
@@ -14,7 +16,7 @@ private:
 	
 private:
 	Window* m_Window = nullptr;
-
 	VInstance* m_Instance = nullptr;
+	VDevice* m_Device = nullptr;
 };
 

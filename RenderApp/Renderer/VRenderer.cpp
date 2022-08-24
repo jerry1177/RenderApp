@@ -11,7 +11,7 @@
 #include <GLFW/glfw3.h>
 
 #include "VInstance.h"
-
+#include "VDevice.h"
 void VRenderer::Init()
 {
 	std::vector<const char*> extensionNames = { VK_KHR_WIN32_SURFACE_EXTENSION_NAME, VK_KHR_SURFACE_EXTENSION_NAME };
@@ -19,6 +19,8 @@ void VRenderer::Init()
 		extensionNames.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
 	m_Instance = new VInstance(extensionNames);
+	m_Device = new VDevice(m_Instance);
+	std::cout << "Device count is: " << m_Device->GetDeviceCount() << std::endl;
 	
 }
 
