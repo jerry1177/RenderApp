@@ -12,6 +12,7 @@ public:
 	void ShutDown();
 	void EnableValidationLayers(const std::vector<const char*>&);
 private:
+	
 private:
 	Window* m_Window = nullptr;
 

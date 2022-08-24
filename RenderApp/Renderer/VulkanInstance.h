@@ -7,25 +7,29 @@ class VulkanInstance {
 public:
 	VulkanInstance();
 	~VulkanInstance();
-	VulkanInstance(const std::vector<VkExtensionProperties>&);
+	VulkanInstance(const std::vector<const char*>&);
 
-	const std::vector<VkExtensionProperties>& GetSupportedExtensions() const { return m_SupportedExtensions; }
-	const std::vector<VkExtensionProperties>& GetRequiredExtensions() const { return m_RequiredExtensions; }
-	static std::vector<VkExtensionProperties> GetExtensionPropertiesFromStrings(const std::vector<std::string>&);
+	const std::vector<const char*>& GetSupportedExtensions() const { return m_SupportedExtensions; }
+	const std::vector<const char*>& GetRequiredExtensions() const { return m_RequiredExtensions; }
+	//static std::vector<VkExtensionProperties> GetExtensionPropertiesFromStrings(const std::vector<std::string>&);
 	static void EnableValidationLayers(std::vector<const char*> validationLayers) { m_ValidationLayers = validationLayers; }
+	static bool HasEnabledValidationLayers() { return m_ValidationLayers.size() > 0; }
 private:
-	const char** getExtensionNames(const std::vector<VkExtensionProperties>&);
-	bool HasRequiredExtensions(const std::vector<VkExtensionProperties>&);
+	bool HasRequiredExtensions(const std::vector<const char*>&);
 	bool HasValidationLayersSupport(const std::vector<const char*>&);
+	void SetSupportedExtensions();
 #ifdef _GLFW_
 	void SetGLFWRequiredExtensions();
 #endif // _GLFW_
-	static std::vector<const char*> MakeVector();
-
+	void SetupDebugMessenger();
+	VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
+	void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
+	void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 private:
 	VkInstance m_Instance;
-	std::vector<VkExtensionProperties> m_SupportedExtensions;
-	std::vector<VkExtensionProperties> m_RequiredExtensions;
+	VkDebugUtilsMessengerEXT m_DebugMessenger;
+	std::vector<const char*> m_SupportedExtensions;
+	std::vector<const char*> m_RequiredExtensions;
 	static std::vector<const char*> m_ValidationLayers;
 	const char** m_CurrentExtensionNames = nullptr;
 

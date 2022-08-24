@@ -11,10 +11,14 @@
 #include <GLFW/glfw3.h>
 
 #include "VulkanInstance.h"
+
 void Renderer::Init()
 {
-	std::vector<std::string> extensionNames = { VK_KHR_WIN32_SURFACE_EXTENSION_NAME, VK_KHR_SURFACE_EXTENSION_NAME };
-	m_Instance = new VulkanInstance(VulkanInstance::GetExtensionPropertiesFromStrings(extensionNames));
+	std::vector<const char*> extensionNames = { VK_KHR_WIN32_SURFACE_EXTENSION_NAME, VK_KHR_SURFACE_EXTENSION_NAME };
+	if (VulkanInstance::HasEnabledValidationLayers()) {
+		extensionNames.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	}
+	m_Instance = new VulkanInstance(extensionNames);
 	
 }
 
@@ -32,4 +36,6 @@ void Renderer::EnableValidationLayers(const std::vector<const char*>& validation
 {
 	VulkanInstance::EnableValidationLayers(validationLayers);
 }
+
+
 
