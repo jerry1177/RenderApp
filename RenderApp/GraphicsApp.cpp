@@ -17,7 +17,7 @@ void GraphicsApp::Init()
 
 	m_Window = new Window(800, 600);
 	
-	if (!m_Renderer) m_Renderer = new Renderer(m_Window);
+	if (!m_Renderer) m_Renderer = new VRenderer(m_Window);
 #ifdef DEBUG
 	const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"

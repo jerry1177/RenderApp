@@ -2,7 +2,7 @@
 #include "App.h"
 #define GLFW_INCLUDE_VULKAN
 #include "Window.h"
-#include "Renderer/Renderer.h"
+#include "Renderer/VRenderer.h"
 class GraphicsApp : public App
 {
 public:
@@ -12,6 +12,6 @@ public:
 	virtual void ShutDown() override;
 private:
 	Window* m_Window = nullptr;
-	Renderer* m_Renderer = nullptr;
+	VRenderer* m_Renderer = nullptr;
 };
 

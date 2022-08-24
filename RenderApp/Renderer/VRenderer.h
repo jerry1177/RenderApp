@@ -1,12 +1,11 @@
 #pragma once
-#include "vulkan/vulkan.hpp"
 
 class Window;
-class VulkanInstance;
-class Renderer
+class VInstance;
+class VRenderer
 {
 public:
-	Renderer(Window* window) : m_Window(window) {}
+	VRenderer(Window* window) : m_Window(window) {}
 	void Init();
 	void Render();
 	void ShutDown();
@@ -16,6 +15,6 @@ private:
 private:
 	Window* m_Window = nullptr;
 
-	VulkanInstance* m_Instance = nullptr;
+	VInstance* m_Instance = nullptr;
 };
 

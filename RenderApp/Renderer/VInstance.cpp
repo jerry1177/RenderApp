@@ -1,11 +1,11 @@
 #include "Renderpch.h"
-#include "VulkanInstance.h"
+#include "VInstance.h"
 #include "vulkan/vulkan.hpp"
 #ifdef _GLFW_
 	#include "GLFW/glfw3.h"
 #endif // _GLFW_ 
 
-std::vector<const char*> VulkanInstance::m_ValidationLayers;
+std::vector<const char*> VInstance::m_ValidationLayers;
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -17,7 +17,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 
 	return VK_FALSE;
 }
-VulkanInstance::VulkanInstance()
+VInstance::VInstance()
 {
 	SetSupportedExtensions();
 
@@ -27,7 +27,7 @@ VulkanInstance::VulkanInstance()
 
 }
 
-VulkanInstance::VulkanInstance(const std::vector<const char*>& extensions)
+VInstance::VInstance(const std::vector<const char*>& extensions)
 {
 #ifdef _GLFW_
 	SetGLFWRequiredExtensions();
@@ -68,7 +68,7 @@ VulkanInstance::VulkanInstance(const std::vector<const char*>& extensions)
 }
 
 
-VulkanInstance::~VulkanInstance()
+VInstance::~VInstance()
 {
 	if (HasEnabledValidationLayers())
 		DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
@@ -77,7 +77,7 @@ VulkanInstance::~VulkanInstance()
 }
 
 
-bool VulkanInstance::HasRequiredExtensions(const std::vector<const char*>& extensions)
+bool VInstance::HasRequiredExtensions(const std::vector<const char*>& extensions)
 {
 	
 	int requireExtensionSize = m_RequiredExtensions.size();
@@ -101,7 +101,7 @@ bool VulkanInstance::HasRequiredExtensions(const std::vector<const char*>& exten
 	return true;
 }
 
-bool VulkanInstance::HasValidationLayersSupport(const std::vector<const char*>& validationLayers)
+bool VInstance::HasValidationLayersSupport(const std::vector<const char*>& validationLayers)
 {
 	uint32_t layerCount;
 	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -124,7 +124,7 @@ bool VulkanInstance::HasValidationLayersSupport(const std::vector<const char*>& 
 	return true;
 }
 
-void VulkanInstance::SetSupportedExtensions()
+void VInstance::SetSupportedExtensions()
 {
 	uint32_t extensionCount = 0;
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -136,21 +136,21 @@ void VulkanInstance::SetSupportedExtensions()
 	}
 }
 
-void VulkanInstance::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
+void VInstance::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
 	createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 	createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 	createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 	createInfo.pfnUserCallback = debugCallback;
 }
-void VulkanInstance::SetupDebugMessenger()
+void VInstance::SetupDebugMessenger()
 {
-	if (!VulkanInstance::HasEnabledValidationLayers()) return;
+	if (!VInstance::HasEnabledValidationLayers()) return;
 	VkDebugUtilsMessengerCreateInfoEXT createInfo{};
 	PopulateDebugMessengerCreateInfo(createInfo);
 	ASSERT(CreateDebugUtilsMessengerEXT(m_Instance, &createInfo, nullptr, &m_DebugMessenger) == VK_SUCCESS, "failed to set up debug messenger!");
 }
-VkResult VulkanInstance::CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
+VkResult VInstance::CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
 	if (func != nullptr) {
 		return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
@@ -159,7 +159,7 @@ VkResult VulkanInstance::CreateDebugUtilsMessengerEXT(VkInstance instance, const
 		return VK_ERROR_EXTENSION_NOT_PRESENT;
 	}
 }
-void VulkanInstance::DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
+void VInstance::DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
 	auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
 	if (func != nullptr) {
 		func(instance, debugMessenger, pAllocator);
@@ -167,7 +167,7 @@ void VulkanInstance::DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugU
 }
 
 #ifdef _GLFW_
-void VulkanInstance::SetGLFWRequiredExtensions()
+void VInstance::SetGLFWRequiredExtensions()
 {
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions;

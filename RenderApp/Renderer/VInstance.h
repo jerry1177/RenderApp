@@ -3,11 +3,11 @@
 struct VkExtensionProperties;
 
 
-class VulkanInstance {
+class VInstance {
 public:
-	VulkanInstance();
-	~VulkanInstance();
-	VulkanInstance(const std::vector<const char*>&);
+	VInstance();
+	~VInstance();
+	VInstance(const std::vector<const char*>&);
 
 	const std::vector<const char*>& GetSupportedExtensions() const { return m_SupportedExtensions; }
 	const std::vector<const char*>& GetRequiredExtensions() const { return m_RequiredExtensions; }

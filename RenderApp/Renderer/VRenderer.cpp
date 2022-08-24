@@ -1,5 +1,5 @@
 #include "Renderpch.h"
-#include "Renderer.h"
+#include "VRenderer.h"
 
 
 #include <iostream>
@@ -10,31 +10,31 @@
 #include "vulkan/vulkan.hpp"
 #include <GLFW/glfw3.h>
 
-#include "VulkanInstance.h"
+#include "VInstance.h"
 
-void Renderer::Init()
+void VRenderer::Init()
 {
 	std::vector<const char*> extensionNames = { VK_KHR_WIN32_SURFACE_EXTENSION_NAME, VK_KHR_SURFACE_EXTENSION_NAME };
-	if (VulkanInstance::HasEnabledValidationLayers()) {
+	if (VInstance::HasEnabledValidationLayers()) {
 		extensionNames.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
-	m_Instance = new VulkanInstance(extensionNames);
+	m_Instance = new VInstance(extensionNames);
 	
 }
 
-void Renderer::Render()
+void VRenderer::Render()
 {
 	
 }
 
-void Renderer::ShutDown()
+void VRenderer::ShutDown()
 {
 	delete m_Instance;
 }
 
-void Renderer::EnableValidationLayers(const std::vector<const char*>& validationLayers)
+void VRenderer::EnableValidationLayers(const std::vector<const char*>& validationLayers)
 {
-	VulkanInstance::EnableValidationLayers(validationLayers);
+	VInstance::EnableValidationLayers(validationLayers);
 }
 
 
