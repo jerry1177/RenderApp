@@ -3,9 +3,11 @@
 #include <vector>
 #include <iostream>
 #include <array>
+#include <sstream>
 #include <string>
 #include <optional>
 #include <map>
+#include <functional>
 
 // Platform Detection
 
@@ -76,3 +78,5 @@
 #else // else
 	#define ASSERT(...)
 #endif // DEBUG
+#define BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
+#define BIT(x) (1 << x)
