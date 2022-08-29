@@ -74,10 +74,9 @@ namespace VEE {
 		createInfo.enabledLayerCount = 0;
 
 		if (m_VInstance->HasEnabledValidationLayers()) {
-			const std::vector<const char*> validationlayers = m_VInstance->GetValidationLayers();
-			createInfo.enabledLayerCount = static_cast<uint32_t>(validationlayers.size());
-			createInfo.ppEnabledLayerNames = validationlayers.data();
+			createInfo.enabledLayerCount = static_cast<uint32_t>(m_VInstance->GetValidationLayers().size());
+			createInfo.ppEnabledLayerNames = m_VInstance->GetValidationLayers().data();
 		}
-		ASSERT(vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_LogicalDevice), "failed to create logical device!");
+		ASSERT(vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_LogicalDevice) == VK_SUCCESS, "failed to create logical device!");
 	}
 }

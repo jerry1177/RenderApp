@@ -14,6 +14,11 @@ namespace VEE {
 		m_VInstance = instance;
 	}
 
+	VDevice::~VDevice()
+	{
+		vkDestroyDevice(m_LogicalDevice, nullptr);
+	}
+
 	std::vector<VkQueueFamilyProperties> VDevice::GetQueueFamilies(const VkPhysicalDevice& device)
 	{
 		uint32_t queueFamilyCount = 0;
