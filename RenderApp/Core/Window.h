@@ -7,7 +7,7 @@ namespace VEE {
 	public:
 		Window(uint32_t width, uint32_t height);
 		~Window();
-
+		void Update();
 		GLFWwindow* GetGLFWWindow() const { return m_Window; }
 		uint32_t GetWidth() const { return m_Data.Width; }
 		uint32_t GetHeight() const { return m_Data.Height; }

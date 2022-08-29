@@ -101,5 +101,12 @@ namespace VEE {
 	Window::~Window()
 	{
 		glfwDestroyWindow(m_Window);
+		glfwTerminate();
 	}
+
+	void Window::Update()
+	{
+		glfwPollEvents();
+	}
+
 }

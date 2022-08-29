@@ -1,10 +1,10 @@
 #include "Renderpch.h"
 #include "GraphicsApp.h"
 #include "Renderer/VRenderer.h"
-#include "Window.h"
-#include <GLFW/glfw3.h>
+#include "Core/Window.h"
 #include "Events/ApplicationEvent.h"
-#include "Input.h"
+#include "Core/Input.h"
+#include <Core/TimeStep.h>
 namespace VEE {
 	GraphicsApp::GraphicsApp() :m_Running(false)
 	{
@@ -32,12 +32,9 @@ namespace VEE {
 		std::cout << "App Is Running!\n";
 
 		while (m_Running) {
-			glfwPollEvents();
-			m_Renderer->Render();
 
-			if (Input::IsKeyReleased(m_Window, GLFW_KEY_E)) {
-				std::cout << "Key E is pressed!\n";
-			}
+			m_Window->Update();
+			m_Renderer->Render();
 		}
 
 
@@ -48,8 +45,6 @@ namespace VEE {
 	{
 		m_Renderer->ShutDown();
 		delete m_Window;
-		m_Window = nullptr;
-		glfwTerminate();
 		std::cout << "App Has Shut Down!\n";
 
 	}

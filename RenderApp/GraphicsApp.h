@@ -1,6 +1,6 @@
 #pragma once
-#include "App.h"
-#include "LayerStack.h"
+#include "Core/App.h"
+#include "Core/LayerStack.h"
 namespace VEE {
 	class Window;
 	class VRenderer;
