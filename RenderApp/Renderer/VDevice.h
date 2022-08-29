@@ -20,7 +20,9 @@ namespace VEE {
 	class VDevice {
 	public:
 		VDevice(VInstance*);
-		virtual ~VDevice() {}
+		virtual ~VDevice() {
+			vkDestroyDevice(m_LogicalDevice, nullptr);
+		}
 		uint32_t GetPysicalDeviceCount() { return m_PhysicalDevices.size(); }
 		const VkPhysicalDevice& GetPhysicalDeviceHandle() const { return m_PhysicalDevice; }
 		const VkDevice& GetLogicalDeviceHandle() const { return m_LogicalDevice; }
@@ -35,6 +37,7 @@ namespace VEE {
 	protected:
 		VkDevice m_LogicalDevice = nullptr;
 		VkPhysicalDevice m_PhysicalDevice = nullptr;
+		VInstance* m_VInstance = nullptr;
 	private:
 		static std::vector<VkPhysicalDevice> m_PhysicalDevices;
 	};

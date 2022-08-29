@@ -36,9 +36,6 @@ namespace VEE {
 			m_Window->Update();
 			m_Renderer->Render();
 		}
-
-
-
 	}
 
 	void GraphicsApp::ShutDown()

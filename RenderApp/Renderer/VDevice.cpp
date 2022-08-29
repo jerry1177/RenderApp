@@ -11,6 +11,7 @@ namespace VEE {
 		vkEnumeratePhysicalDevices(instance->GetHandle(), &deviceCount, nullptr);
 		m_PhysicalDevices.resize(deviceCount);
 		vkEnumeratePhysicalDevices(instance->GetHandle(), &deviceCount, m_PhysicalDevices.data());
+		m_VInstance = instance;
 	}
 
 	std::vector<VkQueueFamilyProperties> VDevice::GetQueueFamilies(const VkPhysicalDevice& device)
