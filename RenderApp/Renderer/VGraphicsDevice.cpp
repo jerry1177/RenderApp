@@ -7,9 +7,12 @@ namespace VEE {
 	{
 		PickPhysicalDevice(GetPhisicalDevices());
 		ASSERT(m_PhysicalDevice != nullptr, "failed to find a suitable GPU!");
+
 		CreatLogicalDevice(m_PhysicalDevice);
-		QueueFamilyIndices indices = findQueueFamilies(m_PhysicalDevice, VK_QUEUE_GRAPHICS_BIT);
-		vkGetDeviceQueue(m_LogicalDevice, indices.graphicsFamily.value(), 0, &m_GraphicsQueue);
+
+		m_Indices = findQueueFamilies(m_PhysicalDevice, VK_QUEUE_GRAPHICS_BIT);
+		std::cout << m_Indices.graphicsFamily.value() << std::endl;
+		vkGetDeviceQueue(m_LogicalDevice, m_Indices.graphicsFamily.value(), 0, &m_GraphicsQueue);
 	}
 
 	void VGraphicsDevice::PickPhysicalDevice(const std::vector<VkPhysicalDevice>& devices)
@@ -77,6 +80,8 @@ namespace VEE {
 			createInfo.enabledLayerCount = static_cast<uint32_t>(m_VInstance->GetValidationLayers().size());
 			createInfo.ppEnabledLayerNames = m_VInstance->GetValidationLayers().data();
 		}
-		ASSERT(vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_LogicalDevice) == VK_SUCCESS, "failed to create logical device!");
+		vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_LogicalDevice);
+		ASSERT(m_LogicalDevice != nullptr, "failed to create logical device!");
+		
 	}
 }

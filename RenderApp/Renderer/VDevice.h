@@ -1,10 +1,10 @@
 #pragma once
 struct VkPhysicalDevice_T;
 struct VkDevice_T;
-typedef struct VkQueueFamilyProperties;
+struct VkQueueFamilyProperties;
 typedef VkPhysicalDevice_T* VkPhysicalDevice;
 typedef VkDevice_T* VkDevice;
-typedef enum VkQueueFlagBits;
+enum VkQueueFlagBits;
 
 namespace VEE {
 	class VInstance;
@@ -21,13 +21,13 @@ namespace VEE {
 	public:
 		VDevice(VInstance*);
 		virtual ~VDevice();
-		uint32_t GetPysicalDeviceCount() { return m_PhysicalDevices.size(); }
+		uint32_t GetPysicalDeviceCount() { return (uint32_t) m_PhysicalDevices.size(); }
 		const VkPhysicalDevice& GetPhysicalDeviceHandle() const { return m_PhysicalDevice; }
 		const VkDevice& GetLogicalDeviceHandle() const { return m_LogicalDevice; }
 		const std::vector<VkPhysicalDevice>& GetPhisicalDevices() const { return m_PhysicalDevices; }
 
 	protected:
-		std::vector< VkQueueFamilyProperties> GetQueueFamilies(const VkPhysicalDevice&);
+		std::vector<VkQueueFamilyProperties> GetQueueFamilies(const VkPhysicalDevice&);
 		virtual void PickPhysicalDevice(const std::vector<VkPhysicalDevice>&) = 0;
 		virtual bool IsDeviceSuitable(VkPhysicalDevice) = 0;
 		virtual QueueFamilyIndices findQueueFamilies(VkPhysicalDevice, VkQueueFlagBits) = 0;

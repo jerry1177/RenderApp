@@ -15,5 +15,6 @@ namespace VEE {
 		void CreatLogicalDevice(VkPhysicalDevice) override;
 	private:
 		VkQueue m_GraphicsQueue;
+		QueueFamilyIndices m_Indices;
 	};
 }

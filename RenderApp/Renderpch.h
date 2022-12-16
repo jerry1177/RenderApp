@@ -54,7 +54,7 @@
 #ifdef DEBUG
 	#define EXPAND_MACRO(x) x
 	#define STRINGIFY_MACRO(x) #x
-#define ERROR(msg, ...) std::cout << msg << __VA_ARGS__ << std::endl
+#define R_ERROR(msg, ...) std::cout << msg << __VA_ARGS__ << std::endl
 
 	#if defined(PLATFORM_WINDOWS)
 		#define DEBUGBREAK() __debugbreak()

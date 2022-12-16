@@ -50,7 +50,7 @@ namespace VEE {
 		createInfo.pApplicationInfo = &appInfo;
 
 
-		createInfo.enabledExtensionCount = extensions.size();
+		createInfo.enabledExtensionCount = (uint32_t) extensions.size();
 
 		createInfo.ppEnabledExtensionNames = extensions.data();
 		createInfo.enabledLayerCount = static_cast<uint32_t>(m_ValidationLayers.size());
@@ -80,7 +80,7 @@ namespace VEE {
 	bool VInstance::HasRequiredExtensions(const std::vector<const char*>& extensions)
 	{
 
-		int requireExtensionSize = m_RequiredExtensions.size();
+		size_t requireExtensionSize = m_RequiredExtensions.size();
 
 		bool hasExtension;
 		if (requireExtensionSize > 0) {
@@ -173,7 +173,7 @@ namespace VEE {
 		const char** glfwExtensions;
 		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-		for (int i = 0; i < glfwExtensionCount; i++) {
+		for (uint32_t i = 0; i < glfwExtensionCount; i++) {
 			m_RequiredExtensions.push_back(glfwExtensions[i]);
 		}
 	}
