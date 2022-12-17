@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h>
 
 #include "VInstance.h"
+#include "VWindowsSurface.h"
 #include "VGraphicsDevice.h"
 namespace VEE {
 	void VRenderer::Init()
@@ -20,9 +21,14 @@ namespace VEE {
 			extensionNames.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		}
 		m_Instance = new VInstance(extensionNames);
-		m_Device = new VGraphicsDevice(m_Instance);
+		m_Surface = new VWindowsSurface(m_Instance, m_Window);
+		m_Device = new VGraphicsDevice(m_Instance, m_Surface);
 		std::cout << "Device count is: " << m_Device->GetPysicalDeviceCount() << std::endl;
 
+		std::cout << "List of Devices:\n";
+		for (const VDeviceName& deviceName : m_Device->GetDeviceNames()) {
+			std::cout << deviceName.GetName() << std::endl;
+		}
 	}
 
 	void VRenderer::Render()
@@ -33,6 +39,7 @@ namespace VEE {
 	void VRenderer::ShutDown()
 	{
 		delete m_Device;
+		delete m_Surface;
 		delete m_Instance;
 	}
 

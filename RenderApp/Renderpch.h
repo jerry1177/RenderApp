@@ -8,6 +8,8 @@
 #include <optional>
 #include <map>
 #include <functional>
+#include <set>
+#include <stdio.h>
 
 // Platform Detection
 

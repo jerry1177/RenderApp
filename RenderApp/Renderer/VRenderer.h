@@ -3,6 +3,7 @@ namespace VEE {
 	class Window;
 	class VInstance;
 	class VDevice;
+	class VWindowsSurface;
 
 	class VRenderer
 	{
@@ -18,5 +19,6 @@ namespace VEE {
 		Window* m_Window = nullptr;
 		VInstance* m_Instance = nullptr;
 		VDevice* m_Device = nullptr;
+		VWindowsSurface* m_Surface = nullptr;
 	};
 }
