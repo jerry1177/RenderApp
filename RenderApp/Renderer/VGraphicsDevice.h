@@ -7,19 +7,18 @@ namespace VEE {
 	class VGraphicsDevice : public VDevice
 	{
 	public:
-		VGraphicsDevice(VInstance*, VWindowsSurface*);
+		VGraphicsDevice(VInstance*, std::vector<const char*>&, VWindowsSurface*);
 		~VGraphicsDevice() {}
 		VkQueue GetGraphicsQueue() const { m_GraphicsQueue; }
 		VkQueue GetPresentQueue() const { m_PresentQueue; }
 	private:
-		void PickPhysicalDevice(const std::vector<VkPhysicalDevice>&) override;
-		bool IsDeviceSuitable(VkPhysicalDevice) override;
-		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice, VkQueueFlagBits) override;
-		void CreatLogicalDevice(VkPhysicalDevice) override;
+		void PickPhysicalDevice(const std::vector<VkPhysicalDevice>&, VWindowsSurface*);
+		bool IsDeviceSuitable(VkPhysicalDevice, VWindowsSurface*);
+		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice, VkQueueFlagBits, VWindowsSurface*);
+		void CreatLogicalDevice(VkPhysicalDevice, VWindowsSurface*);
 	private:
 		VkQueue m_GraphicsQueue;
 		VkQueue m_PresentQueue;
 		QueueFamilyIndices m_Indices;
-		VWindowsSurface* m_Surface;
 	};
 }

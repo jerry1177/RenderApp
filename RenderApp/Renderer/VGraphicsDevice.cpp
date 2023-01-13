@@ -2,16 +2,17 @@
 #include "VGraphicsDevice.h"
 #include "VInstance.h"
 #include "VWindowsSurface.h"
+#include "VSwapChain.h"
 #include "vulkan/vulkan.h"
 namespace VEE {
-	VGraphicsDevice::VGraphicsDevice(VInstance* instance, VWindowsSurface* surface) : VDevice(instance), m_Surface(surface)
+	VGraphicsDevice::VGraphicsDevice(VInstance* instance, std::vector<const char*>& requiredExtensions , VWindowsSurface* surface) : VDevice(instance, requiredExtensions)
 	{
-		PickPhysicalDevice(GetPhisicalDevices());
+		PickPhysicalDevice(GetPhisicalDevices(), surface);
 		ASSERT(m_PhysicalDevice != nullptr, "failed to find a suitable GPU!");
 
-		CreatLogicalDevice(m_PhysicalDevice);
+		CreatLogicalDevice(m_PhysicalDevice, surface);
 
-		m_Indices = findQueueFamilies(m_PhysicalDevice, VK_QUEUE_GRAPHICS_BIT);
+		m_Indices = findQueueFamilies(m_PhysicalDevice, VK_QUEUE_GRAPHICS_BIT, surface);
 		std::cout << m_Indices.graphicsFamily.value() << std::endl;
 		vkGetDeviceQueue(m_LogicalDevice, m_Indices.graphicsFamily.value(), 0, &m_GraphicsQueue);
 		ASSERT(m_GraphicsQueue != nullptr, "failed to get graphics Queue!");
@@ -20,24 +21,30 @@ namespace VEE {
 
 	}
 
-	void VGraphicsDevice::PickPhysicalDevice(const std::vector<VkPhysicalDevice>& devices) // just pick first suitable device for now
+	void VGraphicsDevice::PickPhysicalDevice(const std::vector<VkPhysicalDevice>& devices, VWindowsSurface* surface) // just pick first suitable device for now
 	{
 		for (const auto& device : devices) {
-			if (IsDeviceSuitable(device)) {
+			if (IsDeviceSuitable(device, surface)) {
 				m_PhysicalDevice = device;
 				break;
 			}
 		}
 	}
 
-	bool VGraphicsDevice::IsDeviceSuitable(VkPhysicalDevice device)
+	bool VGraphicsDevice::IsDeviceSuitable(VkPhysicalDevice device, VWindowsSurface* surface)
 	{
-		QueueFamilyIndices indices = findQueueFamilies(device, VK_QUEUE_GRAPHICS_BIT);
+		QueueFamilyIndices indices = findQueueFamilies(device, VK_QUEUE_GRAPHICS_BIT, surface);
+		bool isExtensionsSupported = CheckDeviceExtensionSupport(device);
+		bool swapChainAdaquate = false;
+		if (isExtensionsSupported) {
+			const SwapChainSupportDetails* swapChainDetails = VSwapChain::QuerySupport(this, surface);
+			swapChainAdaquate = !swapChainDetails->formats.empty() && !swapChainDetails->presentModes.empty();
+		}
 
-		return indices.graphicsFamily.has_value() && indices.presentFamily.has_value();
+		return indices.graphicsFamily.has_value() && indices.presentFamily.has_value() && isExtensionsSupported && swapChainAdaquate;
 	}
 
-	QueueFamilyIndices VGraphicsDevice::findQueueFamilies(VkPhysicalDevice device, VkQueueFlagBits queueFlags)
+	QueueFamilyIndices VGraphicsDevice::findQueueFamilies(VkPhysicalDevice device, VkQueueFlagBits queueFlags, VWindowsSurface* surface)
 	{
 		QueueFamilyIndices indices;
 		// Logic to find queue family indices to populate struct with
@@ -53,7 +60,7 @@ namespace VEE {
 				indices.transferFamily = i;
 			}
 			VkBool32 presentSupport = false;
-			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_Surface->GetHandle(), &presentSupport);
+			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface->GetHandle(), &presentSupport);
 			if (presentSupport) {
 				indices.presentFamily = i;
 			}
@@ -62,9 +69,9 @@ namespace VEE {
 		return indices;
 	}
 
-	void VGraphicsDevice::CreatLogicalDevice(VkPhysicalDevice device)
+	void VGraphicsDevice::CreatLogicalDevice(VkPhysicalDevice device, VWindowsSurface* surface)
 	{
-		QueueFamilyIndices indices = findQueueFamilies(device, VK_QUEUE_GRAPHICS_BIT);
+		QueueFamilyIndices indices = findQueueFamilies(device, VK_QUEUE_GRAPHICS_BIT, surface);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 		std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
@@ -86,6 +93,9 @@ namespace VEE {
 
 		createInfo.pQueueCreateInfos = queueCreateInfos.data();
 		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+
+		createInfo.enabledExtensionCount = static_cast<uint32_t>(m_RequiredDeviceExtensions.size());
+		createInfo.ppEnabledExtensionNames = m_RequiredDeviceExtensions.data();
 
 		createInfo.pEnabledFeatures = &deviceFeatures;
 		createInfo.enabledLayerCount = 0;

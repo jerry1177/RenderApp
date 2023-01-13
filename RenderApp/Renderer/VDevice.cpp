@@ -32,7 +32,7 @@ namespace VEE {
 		}
 	}
 
-	VDevice::VDevice(VInstance* instance)
+	VDevice::VDevice(VInstance* instance, std::vector<const char*> requiredExtensions)
 	{
 		if (m_PhysicalDevices.size() == 0) {
 			uint32_t deviceCount = 0;
@@ -50,6 +50,7 @@ namespace VEE {
 				m_PhysicalDeviceNames[i] = properties.deviceName;
 			}
 		}
+		m_RequiredDeviceExtensions = requiredExtensions;
 
 		m_VInstance = instance;
 	}
@@ -60,7 +61,23 @@ namespace VEE {
 	}
 
 	
-	std::vector<VkQueueFamilyProperties> VDevice::GetQueueFamilies(const VkPhysicalDevice& device)
+	bool VDevice::CheckDeviceExtensionSupport(VkPhysicalDevice device)
+	{
+		uint32_t extensionCount;
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());;
+
+		std::set<std::string> requiredExtensions(m_RequiredDeviceExtensions.begin(), m_RequiredDeviceExtensions.end());
+
+		for (const auto& extension : availableExtensions) {
+			requiredExtensions.erase(extension.extensionName);
+		}
+
+		return requiredExtensions.empty();
+	}
+
+	std::vector<VkQueueFamilyProperties> VDevice::GetQueueFamilies(VkPhysicalDevice device)
 	{
 		uint32_t queueFamilyCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);

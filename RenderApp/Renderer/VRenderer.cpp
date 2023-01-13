@@ -22,7 +22,8 @@ namespace VEE {
 		}
 		m_Instance = new VInstance(extensionNames);
 		m_Surface = new VWindowsSurface(m_Instance, m_Window);
-		m_Device = new VGraphicsDevice(m_Instance, m_Surface);
+		std::vector<const char*> deviceExtensionNames = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+		m_Device = new VGraphicsDevice(m_Instance, deviceExtensionNames, m_Surface);
 		std::cout << "Device count is: " << m_Device->GetPysicalDeviceCount() << std::endl;
 
 		std::cout << "List of Devices:\n";

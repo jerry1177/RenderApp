@@ -37,23 +37,22 @@ namespace VEE {
 	
 	class VDevice {
 	public:
-		VDevice(VInstance*);
+		VDevice(VInstance*, std::vector<const char*>);
 		virtual ~VDevice();
 		uint32_t GetPysicalDeviceCount() { return (uint32_t) m_PhysicalDevices.size(); }
-		const VkPhysicalDevice& GetPhysicalDeviceHandle() const { return m_PhysicalDevice; }
+
+		VkPhysicalDevice GetPhysicalDeviceHandle() const { return m_PhysicalDevice; }
 		const VkDevice& GetLogicalDeviceHandle() const { return m_LogicalDevice; }
 		const std::vector<VkPhysicalDevice>& GetPhisicalDevices() const { return m_PhysicalDevices; }
 		const std::vector<VDeviceName>& GetDeviceNames() const { return m_PhysicalDeviceNames; }
 	protected:
-		std::vector<VkQueueFamilyProperties> GetQueueFamilies(const VkPhysicalDevice&);
-		virtual void PickPhysicalDevice(const std::vector<VkPhysicalDevice>&) = 0;
-		virtual bool IsDeviceSuitable(VkPhysicalDevice) = 0;
-		virtual QueueFamilyIndices findQueueFamilies(VkPhysicalDevice, VkQueueFlagBits) = 0;
-		virtual void CreatLogicalDevice(VkPhysicalDevice) = 0;
+		bool CheckDeviceExtensionSupport(VkPhysicalDevice);
+		std::vector<VkQueueFamilyProperties> VDevice::GetQueueFamilies(VkPhysicalDevice);
 	protected:
 		VkDevice m_LogicalDevice = nullptr;
 		VkPhysicalDevice m_PhysicalDevice = nullptr;
 		VInstance* m_VInstance = nullptr;
+		std::vector<const char*> m_RequiredDeviceExtensions;
 	private:
 		static std::vector<VkPhysicalDevice> m_PhysicalDevices;
 		static std::vector<VDeviceName> m_PhysicalDeviceNames;
