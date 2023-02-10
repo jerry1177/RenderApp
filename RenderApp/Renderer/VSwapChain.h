@@ -3,6 +3,7 @@
 namespace VEE {
 	class VDevice;
 	class VWindowsSurface;
+	class Window;
 
 	struct SwapChainSupportDetails {
 		VkSurfaceCapabilitiesKHR capabilities;
@@ -14,6 +15,9 @@ namespace VEE {
 	{
 	public:
 		VSwapChain();
+		VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>&);
+		VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>&);
+		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR&, Window*);
 		static const SwapChainSupportDetails* QuerySupport(VDevice*, VWindowsSurface*);
 		static const SwapChainSupportDetails* ReQuerySupport(VDevice*, VWindowsSurface*);
 		~VSwapChain();

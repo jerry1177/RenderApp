@@ -109,4 +109,11 @@ namespace VEE {
 		glfwPollEvents();
 	}
 
+	VEE::WindowFrameBufferSize Window::GetFrameBufferSize()
+	{
+		WindowFrameBufferSize windowSize;
+		glfwGetFramebufferSize(m_Window, &windowSize.Width, &windowSize.Height);
+		return windowSize;
+	}
+
 }

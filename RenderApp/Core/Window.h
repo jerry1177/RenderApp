@@ -2,6 +2,9 @@
 struct GLFWwindow;
 namespace VEE {
 	class Event;
+	struct WindowFrameBufferSize {
+		int Width, Height;
+	};
 	class Window
 	{
 	public:
@@ -11,6 +14,7 @@ namespace VEE {
 		GLFWwindow* GetGLFWWindow() const { return m_Window; }
 		uint32_t GetWidth() const { return m_Data.Width; }
 		uint32_t GetHeight() const { return m_Data.Height; }
+		WindowFrameBufferSize GetFrameBufferSize();
 
 		void SetEventCallback(const std::function<void(VEE::Event&)>& callback) { m_Data.EventCallback = callback; }
 	private:

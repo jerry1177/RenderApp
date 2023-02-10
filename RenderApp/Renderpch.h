@@ -10,6 +10,8 @@
 #include <functional>
 #include <set>
 #include <stdio.h>
+#include <limits> 
+#include <algorithm>
 
 // Platform Detection
 
