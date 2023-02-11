@@ -15,20 +15,22 @@ namespace VEE {
 		const SwapChainSupportDetails* swapChainSupport = QuerySupport(device->GetPhysicalDeviceHandle(), surface);
 
 		VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport->formats);
+		m_SwapChainImageFormat = surfaceFormat.format;
 		VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport->presentModes);
-		VkExtent2D extent = ChooseSwapExtent(swapChainSupport->capabilities, window);
+		m_SwapChainExtent = ChooseSwapExtent(swapChainSupport->capabilities, window);
 
 		m_ImageCount = swapChainSupport->capabilities.minImageCount + 1;
 		if (swapChainSupport->capabilities.maxImageCount > 0 && m_ImageCount > swapChainSupport->capabilities.maxImageCount) {
 			m_ImageCount = swapChainSupport->capabilities.maxImageCount;
 		}
+
 		VkSwapchainCreateInfoKHR createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		createInfo.surface = surface->GetHandle();
 		createInfo.minImageCount = m_ImageCount;
-		createInfo.imageFormat = surfaceFormat.format;
+		createInfo.imageFormat = m_SwapChainImageFormat;
 		createInfo.imageColorSpace = surfaceFormat.colorSpace;
-		createInfo.imageExtent = extent;
+		createInfo.imageExtent = m_SwapChainExtent;
 		createInfo.imageArrayLayers = 1;
 		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
@@ -54,6 +56,11 @@ namespace VEE {
 		createInfo.oldSwapchain = VK_NULL_HANDLE;
 		vkCreateSwapchainKHR(device->GetLogicalDeviceHandle(), &createInfo, nullptr, &m_SwapChain);
 		ASSERT(m_SwapChain != nullptr, "failed to create SwapChain!");
+
+		vkGetSwapchainImagesKHR(device->GetLogicalDeviceHandle(), m_SwapChain, &m_ImageCount, nullptr);
+		m_SwapChainImages.resize(m_ImageCount);
+		vkGetSwapchainImagesKHR(device->GetLogicalDeviceHandle(), m_SwapChain, &m_ImageCount, m_SwapChainImages.data());
+
 	}
 
 	VSwapChain::~VSwapChain()
