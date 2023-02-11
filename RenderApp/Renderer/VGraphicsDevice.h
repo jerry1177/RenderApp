@@ -11,10 +11,10 @@ namespace VEE {
 		~VGraphicsDevice() {}
 		VkQueue GetGraphicsQueue() const { m_GraphicsQueue; }
 		VkQueue GetPresentQueue() const { m_PresentQueue; }
+		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice, VkQueueFlagBits, VWindowsSurface*);
 	private:
 		void PickPhysicalDevice(const std::vector<VkPhysicalDevice>&, VWindowsSurface*);
 		bool IsDeviceSuitable(VkPhysicalDevice, VWindowsSurface*);
-		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice, VkQueueFlagBits, VWindowsSurface*);
 		void CreatLogicalDevice(VkPhysicalDevice, VWindowsSurface*);
 	private:
 		VkQueue m_GraphicsQueue;

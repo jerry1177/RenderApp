@@ -4,6 +4,7 @@ namespace VEE {
 	class VInstance;
 	class VDevice;
 	class VWindowsSurface;
+	class VSwapChain;
 
 	class VRenderer
 	{
@@ -20,5 +21,6 @@ namespace VEE {
 		VInstance* m_Instance = nullptr;
 		VDevice* m_Device = nullptr;
 		VWindowsSurface* m_Surface = nullptr;
+		VSwapChain* m_SwapChain = nullptr;
 	};
 }

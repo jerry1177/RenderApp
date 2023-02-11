@@ -13,6 +13,7 @@
 #include "VInstance.h"
 #include "VWindowsSurface.h"
 #include "VGraphicsDevice.h"
+#include "VSwapChain.h"
 namespace VEE {
 	void VRenderer::Init()
 	{
@@ -30,6 +31,9 @@ namespace VEE {
 		for (const VDeviceName& deviceName : m_Device->GetDeviceNames()) {
 			std::cout << deviceName.GetName() << std::endl;
 		}
+
+		m_SwapChain = new VSwapChain((VGraphicsDevice*)m_Device, m_Surface, m_Window);
+
 	}
 
 	void VRenderer::Render()
@@ -39,6 +43,7 @@ namespace VEE {
 
 	void VRenderer::ShutDown()
 	{
+		delete m_SwapChain;
 		delete m_Device;
 		delete m_Surface;
 		delete m_Instance;

@@ -1,9 +1,7 @@
 #pragma once
-struct VkPhysicalDevice_T;
-struct VkDevice_T;
 struct VkQueueFamilyProperties;
-typedef VkPhysicalDevice_T* VkPhysicalDevice;
-typedef VkDevice_T* VkDevice;
+typedef struct VkPhysicalDevice_T* VkPhysicalDevice;
+typedef struct VkDevice_T* VkDevice;
 enum VkQueueFlagBits;
 
 namespace VEE {

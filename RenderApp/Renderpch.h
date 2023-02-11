@@ -10,6 +10,7 @@
 #include <functional>
 #include <set>
 #include <stdio.h>
+#include <cstdint>
 #include <limits> 
 #include <algorithm>
 
