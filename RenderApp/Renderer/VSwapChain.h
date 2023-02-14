@@ -31,9 +31,10 @@ namespace VEE {
 	private:
 		static SwapChainSupportDetails* s_Details;
 		uint32_t m_ImageCount;
-		std::vector<VkImage> m_SwapChainImages;
-		VkFormat m_SwapChainImageFormat = VK_FORMAT_UNDEFINED;
-		VkExtent2D m_SwapChainExtent;
+		std::vector<VkImage> m_Images;
+		std::vector<VkImageView> m_ImageViews;
+		VkFormat m_ImageFormat = VK_FORMAT_UNDEFINED;
+		VkExtent2D m_Extent;
 		VkSwapchainKHR m_SwapChain = nullptr;
 		VDevice* m_Device = nullptr;
 	};

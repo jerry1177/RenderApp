@@ -15,9 +15,9 @@ namespace VEE {
 		const SwapChainSupportDetails* swapChainSupport = QuerySupport(device->GetPhysicalDeviceHandle(), surface);
 
 		VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport->formats);
-		m_SwapChainImageFormat = surfaceFormat.format;
+		m_ImageFormat = surfaceFormat.format;
 		VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport->presentModes);
-		m_SwapChainExtent = ChooseSwapExtent(swapChainSupport->capabilities, window);
+		m_Extent = ChooseSwapExtent(swapChainSupport->capabilities, window);
 
 		m_ImageCount = swapChainSupport->capabilities.minImageCount + 1;
 		if (swapChainSupport->capabilities.maxImageCount > 0 && m_ImageCount > swapChainSupport->capabilities.maxImageCount) {
@@ -28,9 +28,9 @@ namespace VEE {
 		createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		createInfo.surface = surface->GetHandle();
 		createInfo.minImageCount = m_ImageCount;
-		createInfo.imageFormat = m_SwapChainImageFormat;
+		createInfo.imageFormat = m_ImageFormat;
 		createInfo.imageColorSpace = surfaceFormat.colorSpace;
-		createInfo.imageExtent = m_SwapChainExtent;
+		createInfo.imageExtent = m_Extent;
 		createInfo.imageArrayLayers = 1;
 		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
@@ -57,14 +57,39 @@ namespace VEE {
 		vkCreateSwapchainKHR(device->GetLogicalDeviceHandle(), &createInfo, nullptr, &m_SwapChain);
 		ASSERT(m_SwapChain != nullptr, "failed to create SwapChain!");
 
+		// get Images
 		vkGetSwapchainImagesKHR(device->GetLogicalDeviceHandle(), m_SwapChain, &m_ImageCount, nullptr);
-		m_SwapChainImages.resize(m_ImageCount);
-		vkGetSwapchainImagesKHR(device->GetLogicalDeviceHandle(), m_SwapChain, &m_ImageCount, m_SwapChainImages.data());
+		m_Images.resize(m_ImageCount);
+		vkGetSwapchainImagesKHR(device->GetLogicalDeviceHandle(), m_SwapChain, &m_ImageCount, m_Images.data());
+		// create Image views
+		m_ImageViews.resize(m_Images.size());
+		for (size_t i = 0; i < m_Images.size(); i++) {
+			VkImageViewCreateInfo createInfo{};
+			createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+			createInfo.image = m_Images[i];
+			createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+			createInfo.format = m_ImageFormat;
+			createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+			createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+			createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+			createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+			createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			createInfo.subresourceRange.baseMipLevel = 0;
+			createInfo.subresourceRange.levelCount = 1;
+			createInfo.subresourceRange.baseArrayLayer = 0;
+			createInfo.subresourceRange.layerCount = 1;
+			vkCreateImageView(m_Device->GetLogicalDeviceHandle(), &createInfo, nullptr, &m_ImageViews[i]);
+			ASSERT(m_ImageViews[i] != nullptr, "failed to create Imageview!")
+		}
 
 	}
 
 	VSwapChain::~VSwapChain()
 	{
+		for (auto imageView : m_ImageViews) {
+			vkDestroyImageView(m_Device->GetLogicalDeviceHandle(), imageView, nullptr);
+		}
+
 		vkDestroySwapchainKHR(m_Device->GetLogicalDeviceHandle(), m_SwapChain, nullptr);
 	}
 
