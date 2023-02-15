@@ -1,6 +1,7 @@
 #pragma once
 #include "vulkan/vulkan.hpp"
 typedef struct VkSwapchainKHR_T* VkSwapchainKHR;
+typedef struct VkPipelineLayout_T* VkPipelineLayout;
 typedef struct VkPhysicalDevice_T* VkPhysicalDevice;
 typedef struct VkImage_T* VkImage;
 typedef struct VkExtent2D;
@@ -27,7 +28,8 @@ namespace VEE {
 		static const SwapChainSupportDetails* QuerySupport(VkPhysicalDevice, VWindowsSurface*);
 		static const SwapChainSupportDetails* ReQuerySupport(VDevice*, VWindowsSurface*);
 		~VSwapChain();
-
+	private:
+		void CreatGraphicsPipeline();
 	private:
 		static SwapChainSupportDetails* s_Details;
 		uint32_t m_ImageCount;
@@ -37,5 +39,6 @@ namespace VEE {
 		VkExtent2D m_Extent;
 		VkSwapchainKHR m_SwapChain = nullptr;
 		VDevice* m_Device = nullptr;
+		VkPipelineLayout m_PipelineLayout = nullptr;
 	};
 }

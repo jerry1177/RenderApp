@@ -70,7 +70,7 @@
 		#error "Platform doesn't support debugbreak yet!"
 	#endif // PLATFORM_WINDOWS
 	
-#define INTERNAL_ASSERT_IMPL(type, check, msg, ...) { if(!(check)) { ##ERROR(msg, __VA_ARGS__); DEBUGBREAK(); } }
+#define INTERNAL_ASSERT_IMPL(type, check, msg, ...) { if(!(check)) { ##R_ERROR(msg, __VA_ARGS__); DEBUGBREAK(); } }
 	#define INTERNAL_ASSERT_WITH_MSG(type, check, ...) INTERNAL_ASSERT_IMPL(type, check, "Assertion failed: ", __VA_ARGS__)
 	#define INTERNAL_ASSERT_NO_MSG(type, check) INTERNAL_ASSERT_IMPL(type, check, "Assertion '{0}' failed at {1}:{2}", STRINGIFY_MACRO(check), std::filesystem::path(__FILE__).filename().string(), __LINE__)
 
