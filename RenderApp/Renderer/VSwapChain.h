@@ -2,6 +2,7 @@
 #include "vulkan/vulkan.hpp"
 typedef struct VkSwapchainKHR_T* VkSwapchainKHR;
 typedef struct VkPipelineLayout_T* VkPipelineLayout;
+typedef struct VkPipeline_T* VkPipeline;
 typedef struct VkPhysicalDevice_T* VkPhysicalDevice;
 typedef struct VkImage_T* VkImage;
 typedef struct VkExtent2D;
@@ -9,6 +10,8 @@ namespace VEE {
 	class VDevice;
 	class VGraphicsDevice;
 	class VWindowsSurface;
+	class VRenderPass;
+	class VFrameBuffer;
 	class Window;
 
 	struct SwapChainSupportDetails {
@@ -40,5 +43,8 @@ namespace VEE {
 		VkSwapchainKHR m_SwapChain = nullptr;
 		VDevice* m_Device = nullptr;
 		VkPipelineLayout m_PipelineLayout = nullptr;
+		VRenderPass* m_RenderPass = nullptr;
+		VkPipeline m_GraphicsPipeline = nullptr;
+		std::vector<VFrameBuffer*> m_FrameBuffers;
 	};
 }

@@ -5,6 +5,8 @@
 #include "VGraphicsDevice.h"
 #include "VertShader.h"
 #include "FragShader.h"
+#include "Renderpass.h"
+#include "FrameBuffer.h"
 #include "vulkan/vulkan.hpp"
 #include <Core/Window.h>
 
@@ -84,12 +86,27 @@ namespace VEE {
 			vkCreateImageView(m_Device->GetLogicalDeviceHandle(), &createInfo, nullptr, &m_ImageViews[i]);
 			ASSERT(m_ImageViews[i] != nullptr, "failed to create Imageview!")
 		}
+
 		CreatGraphicsPipeline();
+
+		m_FrameBuffers.resize(m_ImageViews.size());
+
+		for (size_t i = 0; i < m_FrameBuffers.size(); i++) {
+			VkImageView attachments[] = { m_ImageViews[i] };
+			m_FrameBuffers[i] = new VFrameBuffer(m_Device, attachments, 1, m_RenderPass, m_Extent.width, m_Extent.height, 1);
+		}
 	}
 
 	VSwapChain::~VSwapChain()
 	{
+		for (auto framebuffer : m_FrameBuffers) {
+			delete framebuffer;
+		}
+
+		vkDestroyPipeline(m_Device->GetLogicalDeviceHandle(), m_GraphicsPipeline, nullptr);
 		vkDestroyPipelineLayout(m_Device->GetLogicalDeviceHandle(), m_PipelineLayout, nullptr);
+		delete m_RenderPass;
+
 		for (auto imageView : m_ImageViews) {
 			vkDestroyImageView(m_Device->GetLogicalDeviceHandle(), imageView, nullptr);
 		}
@@ -254,6 +271,17 @@ namespace VEE {
 		colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
 		colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
 
+		VkPipelineColorBlendStateCreateInfo colorBlending{};
+		colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+		colorBlending.logicOpEnable = VK_FALSE;
+		colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
+		colorBlending.attachmentCount = 1;
+		colorBlending.pAttachments = &colorBlendAttachment;
+		colorBlending.blendConstants[0] = 0.0f; // Optional
+		colorBlending.blendConstants[1] = 0.0f; // Optional
+		colorBlending.blendConstants[2] = 0.0f; // Optional
+		colorBlending.blendConstants[3] = 0.0f; // Optional
+
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		pipelineLayoutInfo.setLayoutCount = 0; // Optional
@@ -264,6 +292,29 @@ namespace VEE {
 		vkCreatePipelineLayout(m_Device->GetLogicalDeviceHandle(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout);
 		ASSERT(m_PipelineLayout != nullptr, "failed to create Pipeline Layout!");
 
+		m_RenderPass = new VRenderPass(m_Device, m_ImageFormat);
 
+		VkGraphicsPipelineCreateInfo pipelineInfo{};
+		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+		pipelineInfo.stageCount = 2;
+		pipelineInfo.pStages = shaderStages;
+
+		pipelineInfo.pVertexInputState = &vertexInputInfo;
+		pipelineInfo.pInputAssemblyState = &inputAssembly;
+		pipelineInfo.pViewportState = &viewportState;
+		pipelineInfo.pRasterizationState = &rasterizer;
+		pipelineInfo.pMultisampleState = &multisampling;
+		pipelineInfo.pDepthStencilState = nullptr; // Optional
+		pipelineInfo.pColorBlendState = &colorBlending;
+		pipelineInfo.pDynamicState = &dynamicState;
+
+		pipelineInfo.layout = m_PipelineLayout;
+
+		pipelineInfo.renderPass = m_RenderPass->GetHandle();
+		pipelineInfo.subpass = 0;
+
+		vkCreateGraphicsPipelines(m_Device->GetLogicalDeviceHandle(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_GraphicsPipeline);
+
+		ASSERT(m_PipelineLayout != nullptr, "failed to create Pipeline");
 	}
 }
