@@ -5,6 +5,7 @@ typedef struct VkPipelineLayout_T* VkPipelineLayout;
 typedef struct VkPipeline_T* VkPipeline;
 typedef struct VkPhysicalDevice_T* VkPhysicalDevice;
 typedef struct VkImage_T* VkImage;
+typedef struct VkViewport;
 typedef struct VkExtent2D;
 namespace VEE {
 	class VDevice;
@@ -13,6 +14,7 @@ namespace VEE {
 	class VRenderPass;
 	class VFrameBuffer;
 	class Window;
+	class VCommandBuffer;
 
 	struct SwapChainSupportDetails {
 		VkSurfaceCapabilitiesKHR capabilities;
@@ -25,6 +27,10 @@ namespace VEE {
 	public:
 		VSwapChain(VGraphicsDevice*, VWindowsSurface*, Window*);
 		VkSwapchainKHR GetHandle() { return m_SwapChain; }
+		void BeginRenderPass(VCommandBuffer*, uint32_t);
+		void EndRenderPass(VCommandBuffer*);
+		void BindGraphicsPipeline(VCommandBuffer*);
+		VkExtent2D GetExtent() const { return m_Extent; }
 		VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>&);
 		VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>&);
 		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR&, Window*);

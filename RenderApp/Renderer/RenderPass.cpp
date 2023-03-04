@@ -1,6 +1,8 @@
 #include "Renderpch.h"
 #include "Renderpass.h"
 #include "VDevice.h"
+#include "CommandBuffer.h"
+#include "FrameBuffer.h"
 #include "vulkan/vulkan.h"
 /*
 We need to specify how many color and depth buffers there will be, 
@@ -41,6 +43,25 @@ namespace VEE {
 		vkCreateRenderPass(m_Device->GetLogicalDeviceHandle(), &renderPassInfo, nullptr, &m_RenderPass);
 
 		ASSERT(m_RenderPass != nullptr, "failed to create a Renderpass!");
+	}
+
+	void VRenderPass::Begin(VCommandBuffer* commandBuffer, VFrameBuffer* frameBuffer, VkExtent2D extent)
+	{
+		VkRenderPassBeginInfo renderPassInfo{};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = m_RenderPass;
+		renderPassInfo.framebuffer = frameBuffer->GetHandle();
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.extent = extent;
+		VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
+		renderPassInfo.clearValueCount = 1;
+		renderPassInfo.pClearValues = &clearColor;
+		vkCmdBeginRenderPass(commandBuffer->GetHandle(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	}
+
+	void VRenderPass::End(VCommandBuffer* commandBuffer)
+	{
+		vkCmdEndRenderPass(commandBuffer->GetHandle());
 	}
 
 	VRenderPass::~VRenderPass()

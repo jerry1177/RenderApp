@@ -20,6 +20,8 @@ namespace VEE {
 		const std::vector<VDeviceName>& GetDeviceNames() { return m_Device->GetDeviceNames(); }
 	private:
 		void RecordCommandBuffer();
+		void SetViewPort();
+		void SetScissor();
 
 	private:
 		Window* m_Window = nullptr;

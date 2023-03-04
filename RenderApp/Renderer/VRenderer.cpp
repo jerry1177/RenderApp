@@ -39,7 +39,16 @@ namespace VEE {
 
 	void VRenderer::Render()
 	{
+		m_CommandBuffer->Begin();
+		m_SwapChain->BeginRenderPass(m_CommandBuffer, 0);
+		m_SwapChain->BindGraphicsPipeline(m_CommandBuffer);
+		SetViewPort();
+		SetScissor();
 
+		vkCmdDraw(m_CommandBuffer->GetHandle(), 3, 1, 0, 0);
+
+		m_SwapChain->EndRenderPass(m_CommandBuffer);
+		m_CommandBuffer->End();
 	}
 
 	void VRenderer::ShutDown()
@@ -59,6 +68,28 @@ namespace VEE {
 	void VRenderer::RecordCommandBuffer()
 	{
 
+	}
+
+	void VRenderer::SetViewPort()
+	{
+		VkExtent2D extent = m_SwapChain->GetExtent();
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = static_cast<float>(extent.width);
+		viewport.height = static_cast<float>(extent.height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+		m_CommandBuffer->SetViewPort(viewport);
+	}
+
+	void VRenderer::SetScissor()
+	{
+		VkRect2D scissor{};
+		scissor.offset = { 0, 0 };
+		scissor.extent = m_SwapChain->GetExtent();
+
+		m_CommandBuffer->SetScissor(scissor);
 	}
 
 }

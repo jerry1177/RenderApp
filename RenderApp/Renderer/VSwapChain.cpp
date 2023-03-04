@@ -7,7 +7,8 @@
 #include "FragShader.h"
 #include "Renderpass.h"
 #include "FrameBuffer.h"
-#include "vulkan/vulkan.hpp"
+#include "CommandBuffer.h"
+#include "vulkan/vulkan.h"
 #include <Core/Window.h>
 
 
@@ -113,6 +114,22 @@ namespace VEE {
 		}
 
 		vkDestroySwapchainKHR(m_Device->GetLogicalDeviceHandle(), m_SwapChain, nullptr);
+	}
+
+	void VSwapChain::BeginRenderPass(VCommandBuffer* commandBuffer, uint32_t imageIndex)
+	{
+		m_RenderPass->Begin(commandBuffer, m_FrameBuffers[imageIndex], m_Extent);
+		
+	}
+
+	void VSwapChain::EndRenderPass(VCommandBuffer* commandBuffer)
+	{
+		m_RenderPass->End(commandBuffer);
+	}
+
+	void VSwapChain::BindGraphicsPipeline(VCommandBuffer* commandBuffer)
+	{
+		vkCmdBindPipeline(commandBuffer->GetHandle(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
 	}
 
 	VkSurfaceFormatKHR VSwapChain::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
