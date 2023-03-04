@@ -14,6 +14,9 @@
 #include "VWindowsSurface.h"
 #include "VGraphicsDevice.h"
 #include "VSwapChain.h"
+#include "CommandPool.h"
+#include "CommandBuffer.h"
+
 namespace VEE {
 	void VRenderer::Init()
 	{
@@ -25,14 +28,12 @@ namespace VEE {
 		m_Surface = new VWindowsSurface(m_Instance, m_Window);
 		std::vector<const char*> deviceExtensionNames = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 		m_Device = new VGraphicsDevice(m_Instance, deviceExtensionNames, m_Surface);
-		std::cout << "Device count is: " << m_Device->GetPysicalDeviceCount() << std::endl;
 
-		std::cout << "List of Devices:\n";
-		for (const VDeviceName& deviceName : m_Device->GetDeviceNames()) {
-			std::cout << deviceName.GetName() << std::endl;
-		}
+		VGraphicsDevice* graphicsDevice = (VGraphicsDevice*)m_Device;
+		m_SwapChain = new VSwapChain(graphicsDevice, m_Surface, m_Window);
 
-		m_SwapChain = new VSwapChain((VGraphicsDevice*)m_Device, m_Surface, m_Window);
+		m_CommandPool = new VCommandPool(m_Device, graphicsDevice->GetQueueIndecies().graphicsFamily.value());
+		m_CommandBuffer = new VCommandBuffer(m_Device, m_CommandPool);
 
 	}
 
@@ -43,6 +44,7 @@ namespace VEE {
 
 	void VRenderer::ShutDown()
 	{
+		delete m_CommandPool;
 		delete m_SwapChain;
 		delete m_Device;
 		delete m_Surface;
@@ -52,6 +54,11 @@ namespace VEE {
 	void VRenderer::EnableValidationLayers(const std::vector<const char*>& validationLayers)
 	{
 		VInstance::EnableValidationLayers(validationLayers);
+	}
+
+	void VRenderer::RecordCommandBuffer()
+	{
+
 	}
 
 }

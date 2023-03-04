@@ -24,6 +24,13 @@ namespace VEE {
 #endif // DEBUG
 		m_Renderer->Init();
 		std::cout << "App Initialized!\n";
+		std::cout << "Device count is: " << m_Renderer->GetDeviceNames().size() << std::endl;
+		std::cout << "List of Devices:\n";
+		for (const VDeviceName& deviceName : m_Renderer->GetDeviceNames()) {
+			std::cout << deviceName.GetName() << std::endl;
+		}
+		std::cout << std::endl;
+
 		m_Running = true;
 	}
 

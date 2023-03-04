@@ -1,10 +1,13 @@
 #pragma once
+#include "VDevice.h"
 namespace VEE {
 	class Window;
 	class VInstance;
 	class VDevice;
 	class VWindowsSurface;
 	class VSwapChain;
+	class VCommandPool;
+	class VCommandBuffer;
 
 	class VRenderer
 	{
@@ -14,7 +17,9 @@ namespace VEE {
 		void Render();
 		void ShutDown();
 		void EnableValidationLayers(const std::vector<const char*>&);
+		const std::vector<VDeviceName>& GetDeviceNames() { return m_Device->GetDeviceNames(); }
 	private:
+		void RecordCommandBuffer();
 
 	private:
 		Window* m_Window = nullptr;
@@ -22,5 +27,7 @@ namespace VEE {
 		VDevice* m_Device = nullptr;
 		VWindowsSurface* m_Surface = nullptr;
 		VSwapChain* m_SwapChain = nullptr;
+		VCommandPool* m_CommandPool = nullptr;
+		VCommandBuffer* m_CommandBuffer = nullptr;
 	};
 }

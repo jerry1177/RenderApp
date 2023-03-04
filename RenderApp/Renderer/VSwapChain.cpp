@@ -95,6 +95,7 @@ namespace VEE {
 			VkImageView attachments[] = { m_ImageViews[i] };
 			m_FrameBuffers[i] = new VFrameBuffer(m_Device, attachments, 1, m_RenderPass, m_Extent.width, m_Extent.height, 1);
 		}
+
 	}
 
 	VSwapChain::~VSwapChain()

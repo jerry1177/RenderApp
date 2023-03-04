@@ -13,7 +13,7 @@ namespace VEE {
 		CreatLogicalDevice(m_PhysicalDevice, surface);
 
 		m_Indices = findQueueFamilies(m_PhysicalDevice, VK_QUEUE_GRAPHICS_BIT, surface);
-		std::cout << m_Indices.graphicsFamily.value() << std::endl;
+
 		vkGetDeviceQueue(m_LogicalDevice, m_Indices.graphicsFamily.value(), 0, &m_GraphicsQueue);
 		ASSERT(m_GraphicsQueue != nullptr, "failed to get graphics Queue!");
 		vkGetDeviceQueue(m_LogicalDevice, m_Indices.presentFamily.value(), 0, &m_PresentQueue);
