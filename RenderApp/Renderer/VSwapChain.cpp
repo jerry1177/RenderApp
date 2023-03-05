@@ -8,8 +8,10 @@
 #include "Renderpass.h"
 #include "FrameBuffer.h"
 #include "CommandBuffer.h"
+#include "Semaphore.h"
 #include "vulkan/vulkan.h"
 #include <Core/Window.h>
+#include <future>
 
 
 namespace VEE {
@@ -97,10 +99,13 @@ namespace VEE {
 			m_FrameBuffers[i] = new VFrameBuffer(m_Device, attachments, 1, m_RenderPass, m_Extent.width, m_Extent.height, 1);
 		}
 
+		//m_ImageAvailableSemaphore = new VSemaphore(m_Device);
 	}
 
 	VSwapChain::~VSwapChain()
 	{
+		//delete m_ImageAvailableSemaphore;
+
 		for (auto framebuffer : m_FrameBuffers) {
 			delete framebuffer;
 		}
@@ -130,6 +135,15 @@ namespace VEE {
 	void VSwapChain::BindGraphicsPipeline(VCommandBuffer* commandBuffer)
 	{
 		vkCmdBindPipeline(commandBuffer->GetHandle(), VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
+	}
+
+	uint32_t VSwapChain::AcquireNextImageIndex(VSemaphore* semaphore)
+	{
+		uint32_t imageIndex;
+		vkAcquireNextImageKHR(m_Device->GetLogicalDeviceHandle(), m_SwapChain, UINT64_MAX, semaphore->GetHandle(), VK_NULL_HANDLE, &imageIndex);
+		
+
+		return imageIndex;
 	}
 
 	VkSurfaceFormatKHR VSwapChain::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)

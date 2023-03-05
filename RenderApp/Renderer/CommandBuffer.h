@@ -12,9 +12,10 @@ namespace VEE {
 	public:
 		VCommandBuffer(VDevice*, VCommandPool*);
 		VkCommandBuffer GetHandle() const { return m_CommandBuffer; }
+		const VkCommandBuffer& GetHandleRef() const { return m_CommandBuffer; }
 		void VCommandBuffer::SetViewPort(VkViewport viewPort);
 		void VCommandBuffer::SetScissor(VkRect2D scissor);
-
+		void Reset();
 		void Begin();
 		void End();
 		~VCommandBuffer();

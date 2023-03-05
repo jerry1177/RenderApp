@@ -9,8 +9,8 @@ namespace VEE {
 	public:
 		VGraphicsDevice(VInstance*, std::vector<const char*>&, VWindowsSurface*);
 		~VGraphicsDevice() {}
-		VkQueue GetGraphicsQueue() const { m_GraphicsQueue; }
-		VkQueue GetPresentQueue() const { m_PresentQueue; }
+		VkQueue GetGraphicsQueue() const { return m_GraphicsQueue; }
+		VkQueue GetPresentQueue() const { return m_PresentQueue; }
 		QueueFamilyIndices GetQueueIndecies() const { return m_Indices; }
 
 		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice, VkQueueFlagBits, VWindowsSurface*);

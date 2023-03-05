@@ -30,6 +30,11 @@ namespace VEE {
 		vkCmdSetScissor(m_CommandBuffer, 0, 1, &scissor);
 	}
 
+	void VCommandBuffer::Reset()
+	{
+		vkResetCommandBuffer(m_CommandBuffer, 0);
+	}
+
 	void VCommandBuffer::Begin()
 	{
 		VkCommandBufferBeginInfo beginInfo{};

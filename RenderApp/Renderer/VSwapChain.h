@@ -15,6 +15,7 @@ namespace VEE {
 	class VFrameBuffer;
 	class Window;
 	class VCommandBuffer;
+	class VSemaphore;
 
 	struct SwapChainSupportDetails {
 		VkSurfaceCapabilitiesKHR capabilities;
@@ -30,6 +31,7 @@ namespace VEE {
 		void BeginRenderPass(VCommandBuffer*, uint32_t);
 		void EndRenderPass(VCommandBuffer*);
 		void BindGraphicsPipeline(VCommandBuffer*);
+		uint32_t AcquireNextImageIndex(VSemaphore*);
 		VkExtent2D GetExtent() const { return m_Extent; }
 		VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>&);
 		VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>&);
@@ -41,6 +43,7 @@ namespace VEE {
 		void CreatGraphicsPipeline();
 	private:
 		static SwapChainSupportDetails* s_Details;
+		//VSemaphore* m_ImageAvailableSemaphore = nullptr;
 		uint32_t m_ImageCount;
 		std::vector<VkImage> m_Images;
 		std::vector<VkImageView> m_ImageViews;
