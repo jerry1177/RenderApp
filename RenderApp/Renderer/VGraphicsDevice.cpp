@@ -37,8 +37,8 @@ namespace VEE {
 		bool isExtensionsSupported = CheckDeviceExtensionSupport(device);
 		bool swapChainAdaquate = false;
 		if (isExtensionsSupported) {
-			const SwapChainSupportDetails* swapChainDetails = VSwapChain::QuerySupport(device, surface);
-			swapChainAdaquate = !swapChainDetails->formats.empty() && !swapChainDetails->presentModes.empty();
+			const SurfaceSupportDetails* surfaceDetails = surface->QuerySupport(device);
+			swapChainAdaquate = !surfaceDetails->formats.empty() && !surfaceDetails->presentModes.empty();
 		}
 
 		return indices.graphicsFamily.has_value() && indices.presentFamily.has_value() && isExtensionsSupported && swapChainAdaquate;

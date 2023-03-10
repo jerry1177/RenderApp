@@ -14,6 +14,7 @@ namespace VEE {
 		GLFWwindow* GetGLFWWindow() const { return m_Window; }
 		uint32_t GetWidth() const { return m_Data.Width; }
 		uint32_t GetHeight() const { return m_Data.Height; }
+		bool isMinimized() { return m_Data.Width == 0 || m_Data.Height == 0; }
 		WindowFrameBufferSize GetFrameBufferSize();
 
 		void SetEventCallback(const std::function<void(VEE::Event&)>& callback) { m_Data.EventCallback = callback; }

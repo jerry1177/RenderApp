@@ -5,8 +5,9 @@
 #include "Events/ApplicationEvent.h"
 #include "Core/Input.h"
 #include <Core/TimeStep.h>
+#include <GLFW/glfw3.h>
 namespace VEE {
-	GraphicsApp::GraphicsApp() :m_Running(false)
+	GraphicsApp::GraphicsApp() : m_Running(false)
 	{
 
 	}
@@ -36,11 +37,20 @@ namespace VEE {
 
 	void GraphicsApp::Run()
 	{
-		std::cout << "App Is Running!\n";
-
+		std::cout << "App Is Running!\n\n";
+		float previousTime = 0;
 		while (m_Running) {
+			if (m_Window->isMinimized()) {
+				m_Window->Update();
+				continue;
+			}
+			float currentTime = glfwGetTime();
+			TimeStep timeStep = currentTime - previousTime;
+			previousTime = currentTime;
+			std::cout << "TimeStep: " << 1/timeStep << "ms\n";
 
 			m_Window->Update();
+			//std::cout << "Current Processing Frame: " << m_Renderer->GetCurrentFrame() + 1 << std::endl;
 			m_Renderer->Render();
 		}
 	}
@@ -61,6 +71,9 @@ namespace VEE {
 
 	bool GraphicsApp::OnWIndowResize(WindowResizeEvent& e)
 	{
+		
+		if (m_Renderer)
+			m_Renderer->FrameBufferResized();
 		return false;
 	}
 

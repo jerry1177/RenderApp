@@ -14,6 +14,8 @@
 #include "VWindowsSurface.h"
 #include "VGraphicsDevice.h"
 #include "VSwapChain.h"
+#include "Renderpass.h"
+#include "GraphicsPipeline.h"
 #include "CommandPool.h"
 #include "CommandBuffer.h"
 #include "Semaphore.h"
@@ -32,51 +34,79 @@ namespace VEE {
 		m_Device = new VGraphicsDevice(m_Instance, deviceExtensionNames, m_Surface);
 
 		VGraphicsDevice* graphicsDevice = (VGraphicsDevice*)m_Device;
-		m_SwapChain = new VSwapChain(graphicsDevice, m_Surface, m_Window);
+		VkFormat format = VSwapChain::ChooseSwapSurfaceFormat(m_Surface->QuerySupport(m_Device)->formats).format;
+		
+		m_RenderPass = new VRenderPass(m_Device, format);
+
+		m_SwapChain = new VSwapChain(graphicsDevice, m_Surface, m_Window, m_RenderPass);
+		m_GraphicsPipeline = new VGraphicsPipeline(m_Device, m_RenderPass, m_SwapChain->GetExtent());
 
 		m_CommandPool = new VCommandPool(m_Device, graphicsDevice->GetQueueIndecies().graphicsFamily.value());
-		m_CommandBuffer = new VCommandBuffer(m_Device, m_CommandPool);
-		m_ImageAvailableSemaphore = new VSemaphore(m_Device);
-		m_RenderFinishedSemaphore = new VSemaphore(m_Device);
-		m_InFlightFence = new VFence(m_Device, VK_FENCE_CREATE_SIGNALED_BIT);
+
+		m_CommandBuffers.resize(m_MaxFramesInFlight);
+		for (int i = 0; i < m_CommandBuffers.size(); i++) {
+			m_CommandBuffers[i] = std::make_shared<VCommandBuffer>(m_Device, m_CommandPool);
+		}
+		m_ImageAvailableSemaphores.resize(m_MaxFramesInFlight);
+		for (int i = 0; i < m_ImageAvailableSemaphores.size(); i++) {
+			m_ImageAvailableSemaphores[i] = std::make_shared<VSemaphore>(m_Device);
+		}
+		m_RenderFinishedSemaphores.resize(m_MaxFramesInFlight);
+		for (int i = 0; i < m_RenderFinishedSemaphores.size(); i++) {
+			m_RenderFinishedSemaphores[i] = std::make_shared<VSemaphore>(m_Device);
+		}
+
+		m_InFlightFences.resize(m_MaxFramesInFlight);
+		for (int i = 0; i < m_InFlightFences.size(); i++) {
+			m_InFlightFences[i] = std::make_shared<VFence>(m_Device, VK_FENCE_CREATE_SIGNALED_BIT);
+		}
 	}
 
 	void VRenderer::Render()
 	{
-		vkWaitForFences(m_Device->GetLogicalDeviceHandle(), 1, &m_InFlightFence->GetHandle(), VK_TRUE, UINT64_MAX);
-		vkResetFences(m_Device->GetLogicalDeviceHandle(), 1, &m_InFlightFence->GetHandle());
+		vkWaitForFences(m_Device->GetLogicalDeviceHandle(), 1, &m_InFlightFences[m_CurrentFrame]->GetHandle(), VK_TRUE, UINT64_MAX);
+		//vkResetFences(m_Device->GetLogicalDeviceHandle(), 1, &m_InFlightFences[m_CurrentFrame]->GetHandle());
 
-		uint32_t imageIndex = m_SwapChain->AcquireNextImageIndex(m_ImageAvailableSemaphore);
+		uint32_t imageIndex;
+		VkResult result = m_SwapChain->AcquireNextImageIndex(m_ImageAvailableSemaphores[m_CurrentFrame], imageIndex);
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			RecreateSwapChain();
+			return;
+		}
+		ASSERT((result == VK_SUCCESS) || (result == VK_SUBOPTIMAL_KHR), "failed to acquire swap chain image!");
 
-		m_CommandBuffer->Reset();
-		m_CommandBuffer->Begin();
-		m_SwapChain->BeginRenderPass(m_CommandBuffer, imageIndex);
-		m_SwapChain->BindGraphicsPipeline(m_CommandBuffer);
+		vkResetFences(m_Device->GetLogicalDeviceHandle(), 1, &m_InFlightFences[m_CurrentFrame]->GetHandle());
+
+		m_CommandBuffers[m_CurrentFrame]->Reset();
+		m_CommandBuffers[m_CurrentFrame]->Begin();
+		m_RenderPass->Begin(m_CommandBuffers[m_CurrentFrame], m_SwapChain->GetFrameBufferAt(imageIndex), m_SwapChain->GetExtent());
+		
+		m_GraphicsPipeline->Bind(m_CommandBuffers[m_CurrentFrame]);
 		SetViewPort();
 		SetScissor();
 
-		vkCmdDraw(m_CommandBuffer->GetHandle(), 3, 1, 0, 0);
+		vkCmdDraw(m_CommandBuffers[m_CurrentFrame]->GetHandle(), 3, 1, 0, 0);
 
-		m_SwapChain->EndRenderPass(m_CommandBuffer);
-		m_CommandBuffer->End();
+		m_RenderPass->End(m_CommandBuffers[m_CurrentFrame]);
+		m_CommandBuffers[m_CurrentFrame]->End();
 
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-		VkSemaphore waitSemaphores[] = { m_ImageAvailableSemaphore->GetHandle() };
+		VkSemaphore waitSemaphores[] = { m_ImageAvailableSemaphores[m_CurrentFrame]->GetHandle()};
 		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
 		submitInfo.pWaitDstStageMask = waitStages;
 
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &m_CommandBuffer->GetHandleRef();
+		submitInfo.pCommandBuffers = &m_CommandBuffers[m_CurrentFrame]->GetHandleRef();
 
-		VkSemaphore signalSemaphores[] = { m_RenderFinishedSemaphore->GetHandle() };
+		VkSemaphore signalSemaphores[] = { m_RenderFinishedSemaphores[m_CurrentFrame]->GetHandle()};
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		VkResult result = vkQueueSubmit(m_Device->GetGraphicsQueue(), 1, &submitInfo, m_InFlightFence->GetHandle());
+		result = vkQueueSubmit(m_Device->GetGraphicsQueue(), 1, &submitInfo, m_InFlightFences[m_CurrentFrame]->GetHandle());
 
 		ASSERT(result == VK_SUCCESS, "failed to submit draw command buffer!");
 
@@ -90,16 +120,27 @@ namespace VEE {
 		presentInfo.pImageIndices = &imageIndex;
 		presentInfo.pResults = nullptr;
 
-		vkQueuePresentKHR(m_Device->GetPresentQueue(), &presentInfo);
+		result = vkQueuePresentKHR(m_Device->GetPresentQueue(), &presentInfo);
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_FrameBufferResized) {
+			m_FrameBufferResized = false;
+			RecreateSwapChain();
+		}
+		else if (result != VK_SUCCESS) {
+			throw std::runtime_error("failed to present swap chain image!");
+		}
 
+		m_CurrentFrame = (m_CurrentFrame + 1) % m_MaxFramesInFlight;
 	}
 
 	void VRenderer::ShutDown()
 	{
-		delete m_ImageAvailableSemaphore;
-		delete m_RenderFinishedSemaphore;
-		delete m_InFlightFence;
+		vkDeviceWaitIdle(m_Device->GetLogicalDeviceHandle());
+		m_ImageAvailableSemaphores.clear();
+		m_RenderFinishedSemaphores.clear();
+		m_InFlightFences.clear();
 		delete m_CommandPool;
+		delete m_GraphicsPipeline;
+		delete m_RenderPass;
 		delete m_SwapChain;
 		delete m_Device;
 		delete m_Surface;
@@ -116,8 +157,13 @@ namespace VEE {
 		return m_Device->GetDeviceNames();
 	}
 
-	void VRenderer::RecordCommandBuffer()
+	void VRenderer::RecreateSwapChain()
 	{
+		
+		vkDeviceWaitIdle(m_Device->GetLogicalDeviceHandle());
+		delete m_SwapChain;
+
+		m_SwapChain = new VSwapChain(m_Device, m_Surface, m_Window, m_RenderPass);
 
 	}
 
@@ -131,7 +177,7 @@ namespace VEE {
 		viewport.height = static_cast<float>(extent.height);
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
-		m_CommandBuffer->SetViewPort(viewport);
+		m_CommandBuffers[m_CurrentFrame]->SetViewPort(viewport);
 	}
 
 	void VRenderer::SetScissor()
@@ -140,7 +186,7 @@ namespace VEE {
 		scissor.offset = { 0, 0 };
 		scissor.extent = m_SwapChain->GetExtent();
 
-		m_CommandBuffer->SetScissor(scissor);
+		m_CommandBuffers[m_CurrentFrame]->SetScissor(scissor);
 	}
 
 }

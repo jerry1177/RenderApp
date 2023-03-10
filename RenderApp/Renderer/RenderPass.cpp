@@ -56,7 +56,7 @@ namespace VEE {
 		ASSERT(m_RenderPass != nullptr, "failed to create a Renderpass!");
 	}
 
-	void VRenderPass::Begin(VCommandBuffer* commandBuffer, VFrameBuffer* frameBuffer, VkExtent2D extent)
+	void VRenderPass::Begin(std::shared_ptr<VCommandBuffer>& commandBuffer, VFrameBuffer* frameBuffer, VkExtent2D extent)
 	{
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -70,7 +70,7 @@ namespace VEE {
 		vkCmdBeginRenderPass(commandBuffer->GetHandle(), &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	}
 
-	void VRenderPass::End(VCommandBuffer* commandBuffer)
+	void VRenderPass::End(std::shared_ptr<VCommandBuffer>& commandBuffer)
 	{
 		vkCmdEndRenderPass(commandBuffer->GetHandle());
 	}

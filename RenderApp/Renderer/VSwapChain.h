@@ -7,6 +7,7 @@ typedef struct VkPhysicalDevice_T* VkPhysicalDevice;
 typedef struct VkImage_T* VkImage;
 typedef struct VkViewport;
 typedef struct VkExtent2D;
+enum VkResult;
 namespace VEE {
 	class VDevice;
 	class VGraphicsDevice;
@@ -17,32 +18,24 @@ namespace VEE {
 	class VCommandBuffer;
 	class VSemaphore;
 
-	struct SwapChainSupportDetails {
-		VkSurfaceCapabilitiesKHR capabilities;
-		std::vector<VkSurfaceFormatKHR> formats;
-		std::vector<VkPresentModeKHR> presentModes;
-	};
+	
 
 	class VSwapChain
 	{
 	public:
-		VSwapChain(VGraphicsDevice*, VWindowsSurface*, Window*);
+		VSwapChain(VGraphicsDevice*, VWindowsSurface*, Window*, VRenderPass*);
 		VkSwapchainKHR GetHandle() { return m_SwapChain; }
-		void BeginRenderPass(VCommandBuffer*, uint32_t);
-		void EndRenderPass(VCommandBuffer*);
-		void BindGraphicsPipeline(VCommandBuffer*);
-		uint32_t AcquireNextImageIndex(VSemaphore*);
+		VkResult AcquireNextImageIndex(std::shared_ptr<VSemaphore>&, uint32_t&);
 		VkExtent2D GetExtent() const { return m_Extent; }
-		VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>&);
+		VkFormat GetImageFormat() const { return m_ImageFormat; }
+		VFrameBuffer* GetFrameBufferAt(uint32_t index) { return m_FrameBuffers[index]; }
+		static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>&);
 		VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>&);
 		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR&, Window*);
-		static const SwapChainSupportDetails* QuerySupport(VkPhysicalDevice, VWindowsSurface*);
-		static const SwapChainSupportDetails* ReQuerySupport(VDevice*, VWindowsSurface*);
 		~VSwapChain();
 	private:
-		void CreatGraphicsPipeline();
 	private:
-		static SwapChainSupportDetails* s_Details;
+		//static SurfaceSupportDetails* s_Details;
 		//VSemaphore* m_ImageAvailableSemaphore = nullptr;
 		uint32_t m_ImageCount;
 		std::vector<VkImage> m_Images;
@@ -52,7 +45,6 @@ namespace VEE {
 		VkSwapchainKHR m_SwapChain = nullptr;
 		VDevice* m_Device = nullptr;
 		VkPipelineLayout m_PipelineLayout = nullptr;
-		VRenderPass* m_RenderPass = nullptr;
 		VkPipeline m_GraphicsPipeline = nullptr;
 		std::vector<VFrameBuffer*> m_FrameBuffers;
 	};

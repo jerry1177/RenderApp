@@ -7,6 +7,8 @@ namespace VEE {
 	class VGraphicsDevice;
 	class VWindowsSurface;
 	class VSwapChain;
+	class VRenderPass;
+	class VGraphicsPipeline;
 	class VCommandPool;
 	class VCommandBuffer;
 	class VSemaphore;
@@ -21,22 +23,28 @@ namespace VEE {
 		void ShutDown();
 		void EnableValidationLayers(const std::vector<const char*>&);
 		const std::vector<VDeviceName>& GetDeviceNames();
+		uint32_t GetCurrentFrame() const { return m_CurrentFrame; }
+		void RecreateSwapChain();
+		void FrameBufferResized() { m_FrameBufferResized = true; }
 	private:
-		void RecordCommandBuffer();
 		void SetViewPort();
 		void SetScissor();
 
 	private:
 		uint32_t m_MaxFramesInFlight = 2;
+		bool m_FrameBufferResized = false;
 		Window* m_Window = nullptr;
 		VInstance* m_Instance = nullptr;
 		VGraphicsDevice* m_Device = nullptr;
 		VWindowsSurface* m_Surface = nullptr;
+		VRenderPass* m_RenderPass = nullptr;
+		VGraphicsPipeline* m_GraphicsPipeline = nullptr;
 		VSwapChain* m_SwapChain = nullptr;
 		VCommandPool* m_CommandPool = nullptr;
-		VCommandBuffer* m_CommandBuffer;
-		VSemaphore* m_ImageAvailableSemaphore = nullptr;
-		VSemaphore* m_RenderFinishedSemaphore = nullptr;
-		VFence* m_InFlightFence = nullptr;
+		std::vector<std::shared_ptr<VCommandBuffer>> m_CommandBuffers;
+		std::vector< std::shared_ptr<VSemaphore>> m_ImageAvailableSemaphores;
+		std::vector< std::shared_ptr<VSemaphore>> m_RenderFinishedSemaphores;
+		std::vector< std::shared_ptr<VFence>> m_InFlightFences;
+		uint32_t m_CurrentFrame = 0;
 	};
 }

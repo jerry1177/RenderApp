@@ -11,8 +11,8 @@ namespace VEE {
 	{
 	public:
 		VRenderPass(VDevice*, VkFormat);
-		void Begin(VCommandBuffer*, VFrameBuffer*, VkExtent2D);
-		void End(VCommandBuffer*);
+		void Begin(std::shared_ptr<VCommandBuffer>&, VFrameBuffer*, VkExtent2D);
+		void End(std::shared_ptr<VCommandBuffer>&);
 		VkRenderPass GetHandle() { return m_RenderPass; }
 		~VRenderPass();
 
