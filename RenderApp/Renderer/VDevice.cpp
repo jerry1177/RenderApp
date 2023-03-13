@@ -77,6 +77,56 @@ namespace VEE {
 		return requiredExtensions.empty();
 	}
 
+	float VDevice::ScoreDevice(VkPhysicalDevice device)
+	{
+		uint32_t queueFamilyCount = 0;
+		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+		std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+		VkPhysicalDeviceProperties deviceProperties;
+		vkGetPhysicalDeviceProperties(device, &deviceProperties);
+		VkPhysicalDeviceMemoryProperties devicememProperties;
+		vkGetPhysicalDeviceMemoryProperties(device, &devicememProperties);
+
+		uint32_t GCT_BIT = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT;
+		uint32_t GT_BIT = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT;
+		uint32_t CT_BIT = VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT;
+
+		float score = 0;
+		float perGiga = 0.000000001f;
+		score += deviceProperties.limits.maxMemoryAllocationCount * 0.0015f;
+		score += devicememProperties.memoryHeaps->size * perGiga;
+		score += deviceProperties.limits.maxStorageBufferRange * perGiga;
+
+		for (const auto& queueFamily : queueFamilies) {
+			if ((queueFamily.queueFlags & GCT_BIT) == GCT_BIT) {
+				score += 1.5f * queueFamily.queueCount;
+			}
+			else if ((queueFamily.queueFlags & GT_BIT) == GT_BIT) {
+				score += 1.0f * queueFamily.queueCount;
+			}
+			else if ((queueFamily.queueFlags & CT_BIT) == CT_BIT) {
+				score += 1.0f * queueFamily.queueCount;
+			}
+			else if (queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT && !(queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) && !(queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT)) { // dedicated transfer queue
+				score += 10.0f * queueFamily.queueCount;
+			}
+
+			if (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT) {
+				score += 1.0f * queueFamily.queueCount;
+			}
+			if (queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT) {
+				score += 1.0f * queueFamily.queueCount;
+			}
+			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+				score += 1.0f * queueFamily.queueCount;
+			}
+		}
+		return score;
+
+	}
+
 	std::vector<VkQueueFamilyProperties> VDevice::GetQueueFamilies(VkPhysicalDevice device)
 	{
 		uint32_t queueFamilyCount = 0;
@@ -84,6 +134,8 @@ namespace VEE {
 
 		std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
 		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+		
+
 		return queueFamilies;
 	}
 

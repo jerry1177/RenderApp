@@ -5,12 +5,13 @@
 #include "VertShader.h"
 #include "FragShader.h"
 #include "CommandBuffer.h"
+#include "Buffer.h"
 #include "vulkan/vulkan.hpp"
 
 namespace VEE {
 
 
-	VGraphicsPipeline::VGraphicsPipeline(VDevice* device, VRenderPass* renderPass, VkExtent2D extent) : m_Device(device)
+	VGraphicsPipeline::VGraphicsPipeline(VDevice* device, VRenderPass* renderPass, VkExtent2D extent, const VBufferLayout& bufferLayout) : m_Device(device)
 	{
 		VVertexShader vertShader(m_Device, "RenderApp/Shaders/vert.spv");
 		VFragmentShader fragShader(m_Device, "RenderApp/Shaders/frag.spv");
@@ -20,10 +21,10 @@ namespace VEE {
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputInfo.vertexBindingDescriptionCount = 0;
-		vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-		vertexInputInfo.vertexAttributeDescriptionCount = 0;
-		vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+		vertexInputInfo.vertexBindingDescriptionCount = 1;
+		vertexInputInfo.pVertexBindingDescriptions = &bufferLayout.GetBindingDescription(); // Optional
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(bufferLayout.GetAttributeDescriptions().size());
+		vertexInputInfo.pVertexAttributeDescriptions = bufferLayout.GetAttributeDescriptions().data(); // Optional
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

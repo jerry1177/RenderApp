@@ -23,12 +23,26 @@ namespace VEE {
 
 	void VGraphicsDevice::PickPhysicalDevice(const std::vector<VkPhysicalDevice>& devices, VWindowsSurface* surface) // just pick first suitable device for now
 	{
+		struct SuitableDevice {
+			VkPhysicalDevice device;
+			float score;
+			bool operator()(const SuitableDevice& left, const SuitableDevice& right) const {
+				return left.score < right.score;
+			}
+		};
+		std::priority_queue<SuitableDevice, std::vector<SuitableDevice>, SuitableDevice> suitableDevices;
 		for (const auto& device : devices) {
 			if (IsDeviceSuitable(device, surface)) {
-				m_PhysicalDevice = device;
-				break;
+				suitableDevices.push({ device, ScoreDevice(device) });
+				
 			}
 		}
+
+		m_PhysicalDevice = suitableDevices.top().device;
+		uint32_t queueFamilyCount = 0;
+		VkPhysicalDeviceProperties properties;
+		vkGetPhysicalDeviceProperties(m_PhysicalDevice, &properties);
+		
 	}
 
 	bool VGraphicsDevice::IsDeviceSuitable(VkPhysicalDevice device, VWindowsSurface* surface)
@@ -51,20 +65,20 @@ namespace VEE {
 
 		std::vector<VkQueueFamilyProperties> queueFamilies = GetQueueFamilies(device);
 
-		int i = 0;
+		int index = 0;
 		for (const auto& queueFamily : queueFamilies) {
 			if (queueFamily.queueFlags & queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-				indices.graphicsFamily = i;
+				indices.graphicsFamily = index;
 			}
 			if (queueFamily.queueFlags & queueFlags & VK_QUEUE_TRANSFER_BIT) {
-				indices.transferFamily = i;
+				indices.transferFamily = index;
 			}
 			VkBool32 presentSupport = false;
-			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface->GetHandle(), &presentSupport);
+			vkGetPhysicalDeviceSurfaceSupportKHR(device, index, surface->GetHandle(), &presentSupport);
 			if (presentSupport) {
-				indices.presentFamily = i;
+				indices.presentFamily = index;
 			}
-			i++;
+			index++;
 		}
 		return indices;
 	}

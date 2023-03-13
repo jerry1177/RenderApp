@@ -18,11 +18,12 @@
 #include "GraphicsPipeline.h"
 #include "CommandPool.h"
 #include "CommandBuffer.h"
+#include "Buffer.h"
 #include "Semaphore.h"
 #include "Fence.h"
 
 namespace VEE {
-	void VRenderer::Init()
+	void VRenderer::Init(const VBufferLayout& bufferLayout)
 	{
 		std::vector<const char*> extensionNames = { VK_KHR_WIN32_SURFACE_EXTENSION_NAME, VK_KHR_SURFACE_EXTENSION_NAME };
 		if (VInstance::HasEnabledValidationLayers()) {
@@ -39,7 +40,7 @@ namespace VEE {
 		m_RenderPass = new VRenderPass(m_Device, format);
 
 		m_SwapChain = new VSwapChain(graphicsDevice, m_Surface, m_Window, m_RenderPass);
-		m_GraphicsPipeline = new VGraphicsPipeline(m_Device, m_RenderPass, m_SwapChain->GetExtent());
+		m_GraphicsPipeline = new VGraphicsPipeline(m_Device, m_RenderPass, m_SwapChain->GetExtent(), bufferLayout);
 
 		m_CommandPool = new VCommandPool(m_Device, graphicsDevice->GetQueueIndecies().graphicsFamily.value());
 
@@ -84,8 +85,9 @@ namespace VEE {
 		m_GraphicsPipeline->Bind(m_CommandBuffers[m_CurrentFrame]);
 		SetViewPort();
 		SetScissor();
+		m_VertexBuffer->Bind(m_CommandBuffers[m_CurrentFrame]);
 
-		vkCmdDraw(m_CommandBuffers[m_CurrentFrame]->GetHandle(), 3, 1, 0, 0);
+		vkCmdDraw(m_CommandBuffers[m_CurrentFrame]->GetHandle(), m_VertexBuffer->GetCount(), 1, 0, 0);
 
 		m_RenderPass->End(m_CommandBuffers[m_CurrentFrame]);
 		m_CommandBuffers[m_CurrentFrame]->End();
@@ -135,9 +137,11 @@ namespace VEE {
 	void VRenderer::ShutDown()
 	{
 		vkDeviceWaitIdle(m_Device->GetLogicalDeviceHandle());
+		
 		m_ImageAvailableSemaphores.clear();
 		m_RenderFinishedSemaphores.clear();
 		m_InFlightFences.clear();
+		delete m_VertexBuffer;
 		delete m_CommandPool;
 		delete m_GraphicsPipeline;
 		delete m_RenderPass;
@@ -188,6 +192,12 @@ namespace VEE {
 
 		m_CommandBuffers[m_CurrentFrame]->SetScissor(scissor);
 	}
-
+	void VRenderer::RemoveVertexBuffer()
+	{
+		if (m_VertexBuffer == nullptr) return;
+		vkDeviceWaitIdle(m_Device->GetLogicalDeviceHandle());
+		delete m_VertexBuffer;
+		m_VertexBuffer = nullptr;
+	}
 }
 

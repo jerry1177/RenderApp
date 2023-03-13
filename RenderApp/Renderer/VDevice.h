@@ -24,6 +24,7 @@ namespace VEE {
 		const char* GetName() const { return m_deviceName; }
 		~VDeviceName();
 		VDeviceName& operator=(char*);
+	
 	private:
 		void copy(char*);
 		
@@ -51,6 +52,7 @@ namespace VEE {
 		VkPhysicalDevice m_PhysicalDevice = nullptr;
 		VInstance* m_VInstance = nullptr;
 		std::vector<const char*> m_RequiredDeviceExtensions;
+		float ScoreDevice(VkPhysicalDevice device);
 	private:
 		static std::vector<VkPhysicalDevice> m_PhysicalDevices;
 		static std::vector<VDeviceName> m_PhysicalDeviceNames;
